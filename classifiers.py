@@ -27,10 +27,13 @@ def report(expected, predicted, classifier, message='') :
 def svc( dataset , logmessage=""):
 	(x_train, y_train), (x_test, y_test) = dataset
 	
+	assert(x_train.shape[0] == y_train.shape[0])
+	assert(x_test.shape[0] == y_test.shape[0])
 	
 	# turn the data in a (samples, feature) matrix:
-	n_samples = len(y_train)
-	x_train = x_train.reshape((n_samples, -1))
+	
+	x_train = x_train.reshape((y_train.shape[0], -1))
+	x_test = x_test.reshape((y_test.shape[0], -1))
 	
 	print('SVC: data ready', x_train.shape, y_train.shape, x_test.shape, y_test.shape)
 	
