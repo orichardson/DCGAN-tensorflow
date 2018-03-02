@@ -10,6 +10,10 @@ Created on Fri Mar	2 05:18:46 2018
 import sys
 import os
 from sklearn import svm, metrics   
+from sklearn.decomposition import PCA
+from sklearn.pipeline import Pipeline
+from sklearn.model_selection import GridSearchCV
+
 import numpy as np
 import datetime
 
@@ -24,12 +28,13 @@ def report(expected, predicted, classifier, message='') :
  
 	return metrics.accuracy_score(expected, predicted)
 	
-def svc( dataset , logmessage=""):
+def pcasvc( dataset , logmessage=""):
 	(x_train, y_train), (x_test, y_test) = dataset
 	
 	assert(x_train.shape[0] == y_train.shape[0])
 	assert(x_test.shape[0] == y_test.shape[0])
 	
+	n_components = 150
 	# turn the data in a (samples, feature) matrix:
 	
 	x_train = x_train.reshape((y_train.shape[0], -1))
@@ -37,9 +42,14 @@ def svc( dataset , logmessage=""):
 	
 	print('SVC: data ready', x_train.shape, y_train.shape, x_test.shape, y_test.shape)
 	
-	# Create a classifier: a support vector classifier
-	classifier = svm.SVC(C=1000, kernel='linear')
 	
+	parameters = {'kernel':('linear', 'rbf'), 'C':[1, 10, 100, 1000]}
+
+	classifier = Pipeline(
+		[('pca', PCA(n_components=n_components, svd_solver='randomized', whiten=True)	), 
+		('tuned-svc', GridSearchCV(svm.SVC(), cv=3, n_jobs=1, param_grid=parameters))] )
+		
+		
 	# We learn the digits on the first half of the digits
 	classifier.fit(x_train, y_train)
 
@@ -118,14 +128,14 @@ def net( dataset , logmessage="" ):
 	print('net: model trained')
 
 	 
-	model.save('keras-mnist'+str(int(datetime.datetime.now().timestampe()))+'.model')
+	model.save('keras-mnist'+str(int(datetime.datetime.now().timestamp()))+'.model')
 	y_pred = model.predict(x_test)
 	report(y_test, y_pred, model, logmessage)
 	
 if __name__ == '__main__':
 	import scipy.misc
 	
-	MAX_EXAMPLES_PER_CLASS = 1000
+	MAX_EXAMPLES_PER_CLASS = 100000
 	
 	# Questions
 	# HOw well trained on this test on original
@@ -182,7 +192,7 @@ if __name__ == '__main__':
 	Y_gen = np.array(Ys)
 	gen = (X_gen, Y_gen)
 	
-	for model in [svc, net]:
+	for model in [pcasvc, net]:
 		print("MODEL", model)
 		mstr = str(type(model))			   
 		model( (gen, stand), mstr+" train on gen, test on standard for "+datasetname)
