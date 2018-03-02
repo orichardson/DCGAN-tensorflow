@@ -2,7 +2,7 @@ DATASET = $1
 NLABELS = $2
 
 # cat  | python -i create-dataset-models.py
-for i in {0.. $((NLABELS-1))}
+for i in {0.. $(($NLABELS-1))}
 do
 	echo "***********************************************************\n"
 	echo "LABEL $i for $DATASET$"
