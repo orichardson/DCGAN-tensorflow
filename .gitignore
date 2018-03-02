@@ -4,7 +4,8 @@ samples
 *.zip
 logs
 test*
-
+*.model
+record.txt
 web/js/gen_layers.js
 
 # checkpoint
