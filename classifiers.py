@@ -46,7 +46,7 @@ def pcasvc( dataset , logmessage=""):
 	print('SVC: data ready', x_train.shape, y_train.shape, x_test.shape, y_test.shape)
 	
 
-	classifier = LinearSVC()
+	classifier = svm.LinearSVC(n_jobs=4)
 	#classifier = Pipeline([('pca', PCA(n_components = dim_latent)), ('log', LogisticRegression())], verbose=True);
 	#  too long
 	#	classifier = OneVsRestClassifier(BaggingClassifier(svm.SVC(kernel='linear'),
