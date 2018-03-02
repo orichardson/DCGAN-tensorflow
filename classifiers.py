@@ -11,6 +11,7 @@ import sys
 import os
 from sklearn import svm, metrics   
 import numpy as np
+import datetime
 
 
 def report(expected, predicted, classifier, message='') :
@@ -31,15 +32,21 @@ def svc( dataset , logmessage=""):
     n_samples = len(y_train)
     x_train = x_train.reshape((n_samples, -1))
     
+    print('SVC: data ready')
+    
     # Create a classifier: a support vector classifier
     classifier = svm.SVC(gamma=0.001)
     
     # We learn the digits on the first half of the digits
     classifier.fit(x_train, y_train)
+
+    print('SVC: data fit')
     
     # Now predict the value of the digit on the second half:
     expected = y_test
     predicted = classifier.predict(x_test)
+    print('SVC: data predicted')
+
     report(expected, predicted, classifier, logmessage)  
 
 
@@ -79,6 +86,10 @@ def net( dataset , logmessage="" ):
     y_train = keras.utils.to_categorical(y_train, num_classes)
     y_test = keras.utils.to_categorical(y_test, num_classes)
     
+    
+    print('net: data ready')
+
+    
     model = Sequential()
     model.add(Conv2D(32, kernel_size=(3, 3),
                      activation='relu',
@@ -94,14 +105,17 @@ def net( dataset , logmessage="" ):
     model.compile(loss=keras.losses.categorical_crossentropy,
                   optimizer=keras.optimizers.Adadelta(),
                   metrics=['accuracy'])
-    
+    print('net: model constructed')
+
     model.fit(x_train, y_train,
               batch_size=batch_size,
               epochs=epochs,
               verbose=1,
               validation_data=(x_test, y_test))
+    print('net: model trained')
+
      
-    model.save('keras-mnist.model')
+    model.save('keras-mnist'+str(int(datetime.datetime.now().timestampe()))+'.model')
     y_pred = model.predict(x_test)
     report(y_test, y_pred, model, logmessage)
     
@@ -146,7 +160,6 @@ if __name__ == '__main__':
     
     for f in folders:
         label = int(f[len(datasetname)+1:])
-	print('label: '+str(label))
 
         for imagename in os.listdir(datapath+'/'+f+'/split'):
 
@@ -154,7 +167,6 @@ if __name__ == '__main__':
             # early on in the GAN process are not reused.
             if ('test' in imagename):
                 dataX = scipy.misc.imread(datapath+'/'+f+'/split/'+imagename)
-                print(imagename)   
                 Xs.append(dataX)
                 Ys.append(label)
             
@@ -163,6 +175,7 @@ if __name__ == '__main__':
     gen = (X_gen, Y_gen)
     
     for model in [svc, net]:
+        print("MODEL", model)
         mstr = str(type(model))            
         model( (gen, stand), mstr+" train on gen, test on standard for "+datasetname)
         model( (stand, gen), mstr+" train on stand, test on gen for "+datasetname)
