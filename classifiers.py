@@ -18,7 +18,7 @@ def report(expected, predicted, classifier, message='') :
     print("Classification report for classifier %s:\n%s\n" % (classifier, creport))
     print("Confusion matrix:\n%s" % metrics.confusion_matrix(expected, predicted)) 
     
-    with log as open('./record.txt', 'a'):
+    with open('./record.txt', 'a') as log:
         log.writeline('\n' + ('*'*50) +'\n'+message+'\n\n'+ creport)
  
     return metrics.accuracy_score(expected, predicted)
@@ -123,17 +123,17 @@ if __name__ == '__main__':
     # First load original dataset
     
     def getoriginaldata():
-        if datasetname is 'fashion':
+        if datasetname == 'fashion':
             from keras.datasets import fashion_mnist
             return fashion_mnist.load_data()
             
-        elif datasetname is 'mnist':
+        elif datasetname == 'mnist':
             from keras.datasets import mnist
             return mnist.load_data()
                 
     (xtrain, ytrain), (xtest, ytest) = getoriginaldata()
-    X_stand = np.hstack([xtrain, xtest])
-    Y_stand = np.hstack([ytrain, ytest])
+    X_stand = np.concatenate((xtrain, xtest), axis=0)
+    Y_stand = np.concatenate((ytrain, ytest), axis=0)
     stand = (X_stand, Y_stand)
    
     
@@ -159,11 +159,11 @@ if __name__ == '__main__':
     
     for model in [svc, net]:
         mstr = str(type(model))            
-        model( gen, stand , mstr+" train on gen, test on standard for "+datasetname)
-        model( stand, gen, mstr+" train on stand, test on gen for "+datasetname)
+        model( (gen, stand) , mstr+" train on gen, test on standard for "+datasetname)
+        model( (stand, gen), mstr+" train on stand, test on gen for "+datasetname)
         
         ntrain = int(0.7 * X_gen.shape[0])
-        model( (X_gen[:ntrain], Y_gen[:ntrain]), (X_gen[ntrain:], Y_gen[ntrain:]),
+        model( ((X_gen[:ntrain], Y_gen[:ntrain]), (X_gen[ntrain:], Y_gen[ntrain:])),
               mstr+" train on gen, test on gen for "+datasetname)
 
           
