@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Mar  2 03:06:12 2018
+
+@author: Oliver
+"""
+
 from __future__ import division
 import os
 import time
