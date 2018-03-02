@@ -43,11 +43,12 @@ def pcasvc( dataset , logmessage=""):
 	print('SVC: data ready', x_train.shape, y_train.shape, x_test.shape, y_test.shape)
 	
 	
-	parameters = {'kernel':('linear', 'rbf'), 'C':[1, 10, 100, 1000]}
+	parameters = {'C':[1, 10, 100, 1000]}
 
 	classifier = Pipeline(
 		[('pca', PCA(n_components=n_components, svd_solver='randomized', whiten=True)	), 
-		('tuned-svc', GridSearchCV(svm.SVC(), cv=3, n_jobs=1, param_grid=parameters))] )
+		('tuned-svc', GridSearchCV(svm.SVC(verbose = True), cv=3, n_jobs=1, param_grid=parameters,
+																			verbose=True))] )
 		
 		
 	# We learn the digits on the first half of the digits
