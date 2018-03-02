@@ -5,11 +5,11 @@ Created on Fri Mar  2 03:16:14 2018
 @author: Oliver
 """
 import os, errno
-import imageio
+import scipy.misc
 
 
 def imsave(image, path):
-    return imageio.imwrite(path, image)
+    return scipy.misc.imsave(path, image)
 
 
 def make_dataset_files( dataset ,  base_directory) :
