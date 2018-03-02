@@ -13,7 +13,7 @@ from sklearn import svm, metrics
 from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import GridSearchCV
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegression, LinearSVC
 
 from sklearn.ensemble import BaggingClassifier, RandomForestClassifier
 from sklearn.multiclass import OneVsRestClassifier
@@ -46,8 +46,8 @@ def pcasvc( dataset , logmessage=""):
 	print('SVC: data ready', x_train.shape, y_train.shape, x_test.shape, y_test.shape)
 	
 
-	dim_latent = 60	
-	classifier = Pipeline([('pca', PCA(n_components = dim_latent)), ('log', LogisticRegression())], verbose=True);
+	classifier = LinearSVC()
+	#classifier = Pipeline([('pca', PCA(n_components = dim_latent)), ('log', LogisticRegression())], verbose=True);
 	#  too long
 	#	classifier = OneVsRestClassifier(BaggingClassifier(svm.SVC(kernel='linear'),
 	#					max_samples=1.0 / n_estimators, n_estimators=n_estimators))
@@ -89,8 +89,8 @@ def net( dataset , logmessage="" ):
 		x_test = x_test.reshape(x_test.shape[0], img_rows, img_cols, 1)
 		input_shape = (img_rows, img_cols, 1)
 	
-	x_train = x_train.astype('np.floating')
-	x_test = x_test.astype('np.floating')
+	x_train = x_train.astype('float32')
+	x_test = x_test.astype('float32')
 	x_train /= 255
 	x_test /= 255
 #	 print('x_train shape:', x_train.shape)
