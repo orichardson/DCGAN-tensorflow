@@ -20,7 +20,7 @@ def report(expected, predicted, classifier, message='') :
 	print("Confusion matrix:\n%s" % metrics.confusion_matrix(expected, predicted)) 
 	
 	with open('./record.txt', 'a') as log:
-		log.writeline('\n' + ('*'*50) +'\n'+message+'\n\n'+ creport)
+		log.write('\n' + ('*'*50) +'\n'+message+'\n\n'+ creport)
  
 	return metrics.accuracy_score(expected, predicted)
 	
@@ -38,7 +38,7 @@ def svc( dataset , logmessage=""):
 	print('SVC: data ready', x_train.shape, y_train.shape, x_test.shape, y_test.shape)
 	
 	# Create a classifier: a support vector classifier
-	classifier = svm.SVC(C=1000, kernel='linear', verbose=True)
+	classifier = svm.SVC(C=1000, kernel='linear')
 	
 	# We learn the digits on the first half of the digits
 	classifier.fit(x_train, y_train)
