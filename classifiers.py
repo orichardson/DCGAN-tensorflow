@@ -130,7 +130,8 @@ if __name__ == '__main__':
         elif datasetname == 'mnist':
             from keras.datasets import mnist
             return mnist.load_data()
-                
+        raise ValueError('what is '+datasetname+'??')
+         
     (xtrain, ytrain), (xtest, ytest) = getoriginaldata()
     X_stand = np.concatenate((xtrain, xtest), axis=0)
     Y_stand = np.concatenate((ytrain, ytest), axis=0)
@@ -145,11 +146,15 @@ if __name__ == '__main__':
     
     for f in folders:
         label = int(f[len(datasetname)+1:])
+	print('label: '+str(label))
+
         for imagename in os.listdir(datapath+'/'+f+'/split'):
+
             # VERY IMPORTANT. This next line makes sure shitty training things from 
             # early on in the GAN process are not reused.
             if ('test' in imagename):
                 dataX = scipy.misc.imread(datapath+'/'+f+'/split/'+imagename)
+                print(imagename)   
                 Xs.append(dataX)
                 Ys.append(label)
             
@@ -159,7 +164,7 @@ if __name__ == '__main__':
     
     for model in [svc, net]:
         mstr = str(type(model))            
-        model( (gen, stand) , mstr+" train on gen, test on standard for "+datasetname)
+        model( (gen, stand), mstr+" train on gen, test on standard for "+datasetname)
         model( (stand, gen), mstr+" train on stand, test on gen for "+datasetname)
         
         ntrain = int(0.7 * X_gen.shape[0])
