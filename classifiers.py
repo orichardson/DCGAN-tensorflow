@@ -122,6 +122,8 @@ def net( dataset , logmessage="" ):
 if __name__ == '__main__':
 	import scipy.misc
 	
+	MAX_EXAMPLES_PER_CLASS = 1000
+	
 	# Questions
 	# HOw well trained on this test on original
 	# train on this, test on thsi
@@ -161,8 +163,10 @@ if __name__ == '__main__':
 	for f in folders:
 		label = int(f[len(datasetname)+1:])
 
-		for imagename in os.listdir(datapath+'/'+f+'/split'):
-			
+		for idx, imagename in enumerate(os.listdir(datapath+'/'+f+'/split')):
+			# silly test optimization, force smaller data.			
+			if idx > MAX_EXAMPLES_PER_CLASS:
+				break;
 
 			# VERY IMPORTANT. This next line makes sure shitty training things from 
 			# early on in the GAN process are not reused.
