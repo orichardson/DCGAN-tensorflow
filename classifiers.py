@@ -13,7 +13,7 @@ from sklearn import svm, metrics
 from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import GridSearchCV
-from sklearn.linear_model import LogisticRegression, LinearSVC
+from sklearn.linear_model import LogisticRegression
 
 from sklearn.ensemble import BaggingClassifier, RandomForestClassifier
 from sklearn.multiclass import OneVsRestClassifier
@@ -131,13 +131,16 @@ def net( dataset , logmessage="" ):
 
 	 
 	model.save('keras-mnist'+str(int(datetime.datetime.now().timestamp()))+'.model')
-	y_pred = model.predict(x_test)
-	report(y_test, y_pred, model, logmessage)
+	y_pred_soft = model.predict(x_test)
+	print(y_pred_soft.shape )
+	
+	
+	report(y_test, y_pred_soft.argmax(axis=1), model, logmessage)
 	
 if __name__ == '__main__':
 	import scipy.misc
 	
-	MAX_EXAMPLES_PER_CLASS = 100000
+	EXAMPLES_PER_CLASS = 1000
 	
 	# Questions
 	# HOw well trained on this test on original
@@ -162,13 +165,19 @@ if __name__ == '__main__':
 			from keras.datasets import mnist
 			return mnist.load_data()
 		raise ValueError('what is '+datasetname+'??')
+		
 		 
 	(xtrain, ytrain), (xtest, ytest) = getoriginaldata()
+	nlabels = len(set(ytest))
+
 	X_stand = np.concatenate((xtrain, xtest), axis=0)
 	Y_stand = np.concatenate((ytrain, ytest), axis=0)
 	stand = (X_stand, Y_stand)
-   
+	stand_train = (xtrain, ytrain)
 	
+	indices = np.random.randint(xtrain.shape[0], size=EXAMPLES_PER_CLASS*nlabels)
+	stand_train = stand_train[indices]
+  
 	Xs = []
 	Ys = []
 	
@@ -180,7 +189,7 @@ if __name__ == '__main__':
 
 		for idx, imagename in enumerate(os.listdir(datapath+'/'+f+'/split')):
 			# silly test optimization, force smaller data.			
-			if idx > MAX_EXAMPLES_PER_CLASS:
+			if idx > EXAMPLES_PER_CLASS:
 				break;
 
 			# VERY IMPORTANT. This next line makes sure shitty training things from 
@@ -196,9 +205,10 @@ if __name__ == '__main__':
 	
 	for model in [pcasvc, net]:
 		print("MODEL", model)
-		mstr = str(type(model))			   
-		model( (gen, stand), mstr+" train on gen, test on standard for "+datasetname)
-		model( (stand, gen), mstr+" train on stand, test on gen for "+datasetname)
+		mstr = str(type(model))
+			   
+		model( (gen, stand_train), mstr+" train on gen, test on standard for "+datasetname)
+		model( (stand_train, gen), mstr+" train on stand, test on gen for "+datasetname)
 		
 		ntrain = int(0.7 * X_gen.shape[0])
 		model( ((X_gen[:ntrain], Y_gen[:ntrain]), (X_gen[ntrain:], Y_gen[ntrain:])),
