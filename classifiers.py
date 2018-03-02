@@ -175,7 +175,10 @@ if __name__ == '__main__':
 	stand = (X_stand, Y_stand)
 	stand_train = (xtrain, ytrain)
 	
-	indices = np.random.randint(xtrain.shape[0], size=EXAMPLES_PER_CLASS*nlabels)
+	indices = np.random.randint(0, xtrain.shape[0], size=EXAMPLES_PER_CLASS*nlabels)
+	
+	print(indices)
+	print(indices.dtype)
 	stand_train = stand_train[indices]
   
 	Xs = []
