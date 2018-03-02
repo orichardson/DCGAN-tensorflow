@@ -4,13 +4,8 @@ Created on Fri Mar  2 03:16:14 2018
 
 @author: Oliver
 """
-import os, errno
-import scipy.misc
 
-
-def imsave(image, path):
-    return scipy.misc.imsave(path, image)
-
+from split import ensure_directory, imsave
 
 def make_dataset_files( dataset ,  base_directory) :
     train, test = dataset
@@ -39,9 +34,3 @@ def make_dataset_files( dataset ,  base_directory) :
             save(x, y, mode)
 
 
-def ensure_directory(directory):        
-    try:
-        os.makedirs(directory)
-    except OSError as e:
-        if e.errno != errno.EEXIST:
-            raise
