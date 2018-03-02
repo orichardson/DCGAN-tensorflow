@@ -132,12 +132,13 @@ def net( dataset , logmessage="" ):
 	#model.save('keras-mnist'+str(int(datetime.datetime.now().timestamp()))+'.model')
 	y_pred_soft = model.predict(x_test)
 	y_pred_hard = y_pred_soft.argmax(axis=1)
-	print(y_pred_soft.shape, y_pred_hard.shape, y_test.shape, y_pred_hard.dtype, y_test.dtype)
-	print(y_pred_hard)
-	print(y_test)
+	y_test_hard = y_test.argmax(axis=1)
+	#print(y_pred_soft.shape, y_pred_hard.shape, y_test.shape, y_pred_hard.dtype, y_test.dtype)
+	#print(y_pred_hard)
+	#print(y_test)
 	
 	
-	report(y_test, y_pred_hard, model, logmessage)
+	report(y_test_hard, y_pred_hard, model, logmessage)
 	
 if __name__ == '__main__':
 	import scipy.misc
