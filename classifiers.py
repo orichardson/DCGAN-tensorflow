@@ -5,8 +5,7 @@ Classifiers
 Created on Fri Mar	2 05:18:46 2018
 
 @author: Oliver
-"""
-
+""" 
 import sys
 import os
 from sklearn import svm, metrics   
@@ -46,7 +45,7 @@ def pcasvc( dataset , logmessage=""):
 	print('SVC: data ready', x_train.shape, y_train.shape, x_test.shape, y_test.shape)
 	
 
-	classifier = svm.LinearSVC(n_jobs=4)
+	classifier = svm.LinearSVC()
 	#classifier = Pipeline([('pca', PCA(n_components = dim_latent)), ('log', LogisticRegression())], verbose=True);
 	#  too long
 	#	classifier = OneVsRestClassifier(BaggingClassifier(svm.SVC(kernel='linear'),
@@ -130,7 +129,7 @@ def net( dataset , logmessage="" ):
 	print('net: model trained')
 
 	 
-	model.save('keras-mnist'+str(int(datetime.datetime.now().timestamp()))+'.model')
+	#model.save('keras-mnist'+str(int(datetime.datetime.now().timestamp()))+'.model')
 	y_pred_soft = model.predict(x_test)
 	print(y_pred_soft.shape )
 	
@@ -173,13 +172,10 @@ if __name__ == '__main__':
 	X_stand = np.concatenate((xtrain, xtest), axis=0)
 	Y_stand = np.concatenate((ytrain, ytest), axis=0)
 	stand = (X_stand, Y_stand)
-	stand_train = (xtrain, ytrain)
 	
-	indices = np.array(np.random.randint(0, xtrain.shape[0], size=EXAMPLES_PER_CLASS*nlabels))
-	
-	print(indices)
-	print(indices.dtype)
-	stand_train = stand_train[indices]
+	indices = np.array(np.random.randint(xtrain.shape[0], size=(EXAMPLES_PER_CLASS*nlabels)))
+	stand_train = xtrain[indices], ytrain[indices]
+	#stand_train = stand_train[EXAMPLES_PER_CLASS*nlabels:]
   
 	Xs = []
 	Ys = []
@@ -205,7 +201,11 @@ if __name__ == '__main__':
 	X_gen = np.array(Xs)
 	Y_gen = np.array(Ys)
 	gen = (X_gen, Y_gen)
+
 	
+	print("x-gen", X_gen.shape)
+	print("y-gen", Y_gen.shape)
+
 	for model in [pcasvc, net]:
 		print("MODEL", model)
 		mstr = str(type(model))
