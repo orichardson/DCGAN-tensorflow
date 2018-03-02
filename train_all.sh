@@ -7,7 +7,7 @@ for ((i=0;i<NLABELS;i++)); do
 	echo $"LABEL $i for $DATASET$"
 	SAMPLE_DIR=$"./samples/$DATASET-$i"
 
-	python main.py --dataset $1 --input_fname_pattern="0/train/*.jpg" --input_height=28 --output_height=28 --sample_dir=$SAMPLE_DIR --checkpoint_dir="./checkpoint/$1-$i" --epoch=20 --generate_test_images=300 --train
+	python main.py --dataset $1 --input_fname_pattern=$"$i/train/*.jpg" --input_height=28 --output_height=28 --sample_dir=$SAMPLE_DIR --checkpoint_dir="./checkpoint/$1-$i" --epoch=20 --generate_test_images=300 --train
 	
 	python split.py $SAMPLE_DIR 64
 	
