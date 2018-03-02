@@ -14,6 +14,9 @@ from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import GridSearchCV
 
+from sklearn.ensemble import BaggingClassifier, RandomForestClassifier
+from sklearn.multiclass import OneVsRestClassifier
+
 import numpy as np
 import datetime
 
@@ -34,7 +37,6 @@ def pcasvc( dataset , logmessage=""):
 	assert(x_train.shape[0] == y_train.shape[0])
 	assert(x_test.shape[0] == y_test.shape[0])
 	
-	n_components = 150
 	# turn the data in a (samples, feature) matrix:
 	
 	x_train = x_train.reshape((y_train.shape[0], -1))
@@ -42,18 +44,14 @@ def pcasvc( dataset , logmessage=""):
 	
 	print('SVC: data ready', x_train.shape, y_train.shape, x_test.shape, y_test.shape)
 	
-	
-	parameters = {'C':[1, 10, 100, 1000]}
 
-	classifier = Pipeline(
-		[('pca', PCA(n_components=n_components, svd_solver='randomized', whiten=True)	), 
-		('tuned-svc', GridSearchCV(svm.SVC(verbose = True), cv=3, n_jobs=1, param_grid=parameters,
-																			verbose=True))] )
+	n_estimators = 10	
+	classifier = OneVsRestClassifier(BaggingClassifier(svm.SVC(kernel='linear', class_weight='auto'),
+						max_samples=1.0 / n_estimators, n_estimators=n_estimators))
 		
 		
 	# We learn the digits on the first half of the digits
 	classifier.fit(x_train, y_train)
-
 	print('SVC: data fit')
 	
 	# Now predict the value of the digit on the second half:
