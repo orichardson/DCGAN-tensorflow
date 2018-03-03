@@ -25,8 +25,14 @@ from sklearn import svm, metrics
 #from sklearn.multiclass import OneVsRestClassifier
 
 import numpy as np
-#import datetime
+import tensorflow as tf
 
+#import datetime
+flags = tf.app.flags
+flags.DEFINE_string("models", "linsvc,cnet", "the models to run")
+flags.DEFINE_bool("adversarial", False, "run adversarial attacks")
+
+FLAGS = flags.FLAGS
 
 def report(expected, predicted, message='', outfile = './record.txt') :
 	creport = metrics.classification_report(expected, predicted)
@@ -173,6 +179,7 @@ def shuffle(data):
 	return X[idx], Y[idx], '§'+n
 
 	
+global VARS;
 if __name__ == '__main__':
 	import scipy.misc
 	
@@ -248,10 +255,15 @@ if __name__ == '__main__':
 	gen_small_train, gen_small_test = ttsplit(*gen_small, 0.7)
 
 	print("ALL DATA LOADED\n" + '*'*50)
-	
-	for name, learner in (linsvc(), net()):
-		print("learner: ", name)
 
+	learners = dict(linsvc(), net())
+	
+	global VARS
+	vars = locals()
+	
+	for name in FLAGS.models.split(','):
+		learner = learners[name]
+		print("learner: ", name)
 			   
 		# train on gen, test on standard_all 
 		learner.train(*gen_small_train) \
