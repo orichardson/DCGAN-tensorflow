@@ -75,6 +75,7 @@ def linsvc():
 		#classifier = OneVsRestClassifier(BaggingClassifier(svm.SVC(kernel='linear'),
 		#				max_samples=1.0 / n_estimators, n_estimators=n_estimators))
 		classifier.fit(X, Y)
+		return classifier
 	
 	
 	return build(pre, modeler, post, "lin-svc")
