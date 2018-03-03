@@ -239,8 +239,9 @@ if __name__ == '__main__':
 			
 	X_gen = np.array(Xs)
 	Y_gen = np.array(Ys)
-	gen = (X_gen, Y_gen, datasetname + '-gen-' + gen_method)
-	shuffle(gen)
+	gen_inorder = X_gen, Y_gen, datasetname + '-gen-' + gen_method
+	gen = shuffle(gen_inorder)
+
 	#gen_small = sample(gen, N_EXAMPLES)
 	gen_small = gen
 	
