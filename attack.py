@@ -17,6 +17,8 @@ import tensorflow as tf
 #FLAGS = flags.FLAGS
 
 def attacks(model, X_test, Y_test):
+	from keras import backend as K
+	K.training_phase = 0
 	run_config = tf.ConfigProto()
 	run_config.gpu_options.allow_growth=True
 		
