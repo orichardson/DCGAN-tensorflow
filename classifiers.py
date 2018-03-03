@@ -256,12 +256,16 @@ if __name__ == '__main__':
 
 	print("ALL DATA LOADED\n" + '*'*50)
 
-	learners = dict(linsvc(), net())
+	learners = dict([linsvc(), net()])
 	
 	global VARS
 	vars = locals()
 	
 	for name in FLAGS.models.split(','):
+		if name not in learners:
+			print("NO such learner: "+name)
+			continue
+		
 		learner = learners[name]
 		print("learner: ", name)
 			   
