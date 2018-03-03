@@ -92,7 +92,7 @@ def linsvc():
 		return classifier
 	
 	
-	return build(pre, modeler, post, "lin-svc")
+	return build(pre, modeler, post, "linsvc")
 
 
 def net():
