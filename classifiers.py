@@ -221,8 +221,8 @@ if __name__ == '__main__':
 	Y_stand = np.concatenate((ytrain, ytest), axis=0)
 	stand_all = X_stand, Y_stand, 'standard-'+datasetname+'-all'
 	
-	stand_train_small = sample(stand_train, N_EXAMPLES)
-	stand_test_small = sample(stand_test, N_EXAMPLES)
+	stand_train_small = sample(stand_train, N_EXAMPLES) if N_EXAMPLES < stand_train[0].shape[0] else stand_train
+	stand_test_small = sample(stand_test, N_EXAMPLES) if N_EXAMPLES < stand_test[0].shape[0] else stand_test
   
 	Xs = []
 	Ys = []
