@@ -31,7 +31,8 @@ import tensorflow as tf
 flags = tf.app.flags
 flags.DEFINE_string("models", "linsvc,cnet", "the models to run")
 flags.DEFINE_bool("adversarial", False, "run adversarial attacks")
-
+flags.DEFINE_integer("examples", 20000, "number of examples")
+flags.DEFINE_string("log", 'record.txt' , "log file")
 FLAGS = flags.FLAGS
 
 def report(expected, predicted, message='', outfile = './record.txt') :
@@ -63,7 +64,7 @@ def build(pre, modeler, post, name):
 			
 			print(name, ' -- test data predicted')
 			
-			report(expect, predict, "Training: "+train_descr+"\n Testing: "+test_descr, './record-'+name+'.txt')
+			report(expect, predict, "Model: "+name+"\nTraining: "+train_descr+"\n Testing: "+test_descr, FLAGS.log)
 			return test
 			
 		
@@ -183,7 +184,7 @@ global VARS;
 if __name__ == '__main__':
 	import scipy.misc
 	
-	N_EXAMPLES = 20000
+	N_EXAMPLES = FLAGS.n_examples
 	
 	# Questions
 	# HOw well trained on this test on original
@@ -259,7 +260,7 @@ if __name__ == '__main__':
 	learners = dict([linsvc(), net()])
 	
 	global VARS
-	vars = locals()
+	VARS = locals()
 	
 	for name in FLAGS.models.split(','):
 		if name not in learners:

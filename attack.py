@@ -18,8 +18,6 @@ import tensorflow as tf
 #FLAGS = flags.FLAGS
 
 def attacks(model, sess):
-	# Initialize the Fast Gradient Sign Method (FGSM) attack object and graph
-	report = AccuracyReport()
 	
 	# Define input TF placeholder
 	x = tf.placeholder(tf.float32, shape=(None, 28, 28, 1))
@@ -36,8 +34,4 @@ def attacks(model, sess):
 	adv_x = tf.stop_gradient(adv_x)
 	preds_adv = model(adv_x)
 	
-	# Evaluate the accuracy of the MNIST model on adversarial examples
-	eval_par = {'batch_size': batch_size}
-	acc = model_eval(sess, x, y, preds_adv, X_test, Y_test, args=eval_par)
-	print('Test accuracy on adversarial examples: %0.4f\n' % acc)
-	report.clean_train_adv_eval = acc
+	
