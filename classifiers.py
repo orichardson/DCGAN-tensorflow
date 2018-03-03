@@ -27,7 +27,7 @@ from sklearn import svm, metrics
 import numpy as np
 import tensorflow as tf
 
-from attack import attack
+from attack import attacks
 
 #import datetime
 flags = tf.app.flags
@@ -60,7 +60,7 @@ def build(pre, modeler, post, name):
 		def test(x_test_raw, y_test_raw, test_descr):
 			x_test, y_test, params2 = pre(x_test_raw, y_test_raw)
 			
-			accuracy = attack(clf, x_test, y_test)
+			accuracy = attacks(clf, x_test, y_test)
 			# require params = params2
 			adv = "\n\nvulnerability: "+str(accuracy) if FLAGS.adversarial else ''
 	
