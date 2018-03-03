@@ -41,7 +41,9 @@ def build(pre, modeler, post, name):
 		print(name, ' -- train data fit.')
 		
 		def test(x_test_raw, y_test_raw, test_descr):
-			x_test, y_test = pre(x_test_raw, y_test_raw)
+			x_test, y_test, params2 = pre(x_test_raw, y_test_raw)
+			
+			# require params = params2
 	
 			predict = post(clf.predict(x_test))
 			expect = post(y_test)
