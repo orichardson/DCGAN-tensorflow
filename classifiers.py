@@ -135,7 +135,7 @@ def net():
 def sample(dataset, number):
 	xs, ys, name = dataset
 	indices = np.array(np.random.randint(xs.shape[0], size=number))
-	return xs[indices], ys[indices], name+'-mini'+number
+	return xs[indices], ys[indices], name+'-crop['+str(number)+']'
 	
 def ttsplit(X,Y, name, prc):
 	n = int(prc * X.shape[0])
