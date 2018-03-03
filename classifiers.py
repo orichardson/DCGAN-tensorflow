@@ -32,7 +32,7 @@ from attack import attacks
 #import datetime
 flags = tf.app.flags
 flags.DEFINE_string("models", "linsvc,cnet", "the models to run")
-flags.DEFINE_bool("adversarial", True, "run adversarial attacks")
+flags.DEFINE_bool("adversarial", False, "run adversarial attacks")
 flags.DEFINE_integer("examples", 20000, "number of examples")
 flags.DEFINE_string("log", 'record.txt' , "log file")
 FLAGS = flags.FLAGS
@@ -215,6 +215,10 @@ if __name__ == '__main__':
 		elif datasetname == 'mnist':
 			from keras.datasets import mnist
 			return mnist.load_data()
+		elif datasetname == 'cifar10':
+			from keras.datasets import cifar10
+			return cifar10.load_data()
+
 		raise ValueError('what is '+datasetname+'??')
 		
 	(xtrain, ytrain), (xtest, ytest) = getoriginaldata()

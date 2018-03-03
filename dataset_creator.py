@@ -7,6 +7,35 @@ Created on Fri Mar  2 03:16:14 2018
 
 from split import ensure_directory, imsave
 
+
+"""
+This method creates datasets segregated by label in the folders
+<basedir>/<label>/<mode>/im<>.jpg
+
+e.g.
+data/cifar/0/train/im32.jpg
+
+:param: dataset ( (x_train, y_train), (x_test, y_test) )
+
+"""
+
+#from keras import datasets as kdat
+#import pkgutil
+
+# this is the package we are inspecting -- for example 'email' from stdlib
+
+def make_dataset_from_karas(name) :
+	pass
+	#exec("import keras.datasets.%s as adataset" % name)
+	#print("import keras.datasets.%s as adataset" % name)
+	#dataset = adataset.load_data()
+	#print(dataset[0][0].shape)
+
+
+	#make_dataset_files(dataset, './make_dataset_files')	
+	#for importer, modname, ispkg in pkgutil.iter_modules(kdat.__path__):
+#		kdat.cifar10.load_data(name)
+
 def make_dataset_files( dataset ,  base_directory) :
     train, test = dataset
     data = {"train" :  train, "test": test}  
