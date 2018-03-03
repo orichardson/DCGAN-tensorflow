@@ -184,7 +184,7 @@ global VARS;
 if __name__ == '__main__':
 	import scipy.misc
 	
-	N_EXAMPLES = FLAGS.n_examples
+	N_EXAMPLES = FLAGS.examples
 	
 	# Questions
 	# HOw well trained on this test on original
