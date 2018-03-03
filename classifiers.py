@@ -159,7 +159,7 @@ def both(data1, data2):
 if __name__ == '__main__':
 	import scipy.misc
 	
-	N_EXAMPLES = 10000
+	N_EXAMPLES = 20000
 	
 	# Questions
 	# HOw well trained on this test on original
@@ -237,13 +237,14 @@ if __name__ == '__main__':
 
 			   
 		# train on gen, test on standard_all 
-		learner.train(gen_small_train) \
-			.test(stand_train_small)(stand_test_small)(gen_small_test)
+		learner.train(*gen_small_train) \
+			.test(*stand_train_small)(*stand_test_small)(*gen_small_test)
 			
-		learner.train(stand_train_small) \
-			.test(stand_test_small)(gen_small_test)(gen_small)
+		learner.train(*stand_train_small) \
+			.test(*stand_test_small)(*gen_small_test)(*gen_small)
 			
-		learner.train(gen_small)
+		learner.train(gen_small) \
+			.test(*stand_test)(*stand_all)
 		
 		  
 		
