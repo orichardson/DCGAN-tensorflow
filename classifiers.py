@@ -28,6 +28,7 @@ import numpy as np
 import tensorflow as tf
 
 from attack import attacks
+import scipy.misc
 
 #import datetime
 flags = tf.app.flags
@@ -60,9 +61,13 @@ def build(pre, modeler, post, name):
 		def test(x_test_raw, y_test_raw, test_descr):
 			x_test, y_test, params2 = pre(x_test_raw, y_test_raw)
 			
-			accuracy = attacks(clf, x_test, y_test)
-			# require params = params2
-			adv = "\n\nvulnerability: "+str(accuracy) if FLAGS.adversarial else ''
+			
+			if( FLAGS.adversarial ) :
+				accuracy = attacks(clf, x_test, y_test)
+				# require params = params2
+				adv = "\n\nvulnerability: "+str(accuracy)
+			else:
+				adv = ''
 	
 			predict = post(clf.predict(x_test))
 			expect = post(y_test)
@@ -208,6 +213,7 @@ if __name__ == '__main__':
 	# First load original dataset
 	
 	def getoriginaldata():
+		# I suspsect these might be faster which is why I've left them in.		
 		if datasetname == 'fashion':
 			from keras.datasets import fashion_mnist
 			return fashion_mnist.load_data()
@@ -219,7 +225,25 @@ if __name__ == '__main__':
 			from keras.datasets import cifar10
 			return cifar10.load_data()
 
-		raise ValueError('what is '+datasetname+'??')
+		from scipy.misc import imread
+
+		Xs = {'train': [], 'test':[]}
+		Ys = {'train': [], 'test':[]}
+		
+		base = './data/'+datasetname
+		for slabel in os.listdir(base):
+			for mode in 'train', 'test':
+				base2 = base + '/' + slabel+ '/ ' + mode
+				for imgfn in os.listdir(base2):
+					x = imread(base2+"/"+imgfn)
+					Xs[mode].append(x)
+					Ys[mode].append(int(slabel))
+		
+		
+		
+		return (np.array(Xs['train']), np.array(Ys['train'])), (np.array(Xs['test']), np.array(Ys['test']))
+
+		#raise ValueError('what is '+datasetname+'??')
 		
 	(xtrain, ytrain), (xtest, ytest) = getoriginaldata()
 	nlabels = len(set(ytest))
