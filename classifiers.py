@@ -196,7 +196,7 @@ if __name__ == '__main__':
 	Y_stand = np.concatenate((ytrain, ytest), axis=0)
 	stand_all = X_stand, Y_stand, 'standard-'+datasetname+'-all'
 	
-	stand_train_small = sample(stand_train, N_EXAMPLES),
+	stand_train_small = sample(stand_train, N_EXAMPLES)
 	stand_test_small = sample(stand_test, N_EXAMPLES)
   
 	Xs = []
@@ -243,7 +243,7 @@ if __name__ == '__main__':
 		learner.train(*stand_train_small) \
 			.test(*stand_test_small)(*gen_small_test)(*gen_small)
 			
-		learner.train(gen_small) \
+		learner.train(*gen_small) \
 			.test(*stand_test)(*stand_all)
 		
 		  
