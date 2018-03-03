@@ -27,13 +27,16 @@ from sklearn import svm, metrics
 import numpy as np
 import tensorflow as tf
 
+from attack import attack
+
 #import datetime
 flags = tf.app.flags
 flags.DEFINE_string("models", "linsvc,cnet", "the models to run")
-flags.DEFINE_bool("adversarial", False, "run adversarial attacks")
+flags.DEFINE_bool("adversarial", True, "run adversarial attacks")
 flags.DEFINE_integer("examples", 20000, "number of examples")
 flags.DEFINE_string("log", 'record.txt' , "log file")
 FLAGS = flags.FLAGS
+
 
 def report(expected, predicted, message='', outfile = './record.txt') :
 	creport = metrics.classification_report(expected, predicted)
@@ -57,14 +60,17 @@ def build(pre, modeler, post, name):
 		def test(x_test_raw, y_test_raw, test_descr):
 			x_test, y_test, params2 = pre(x_test_raw, y_test_raw)
 			
+			accuracy = attack(clf, x_test, y_test)
 			# require params = params2
+			adv = "\n\nvulnerability: "+str(accuracy) if FLAGS.adversarial else ''
 	
 			predict = post(clf.predict(x_test))
 			expect = post(y_test)
 			
 			print(name, ' -- test data predicted')
 			
-			report(expect, predict, "Model: "+name+"\nTraining: "+train_descr+"\n Testing: "+test_descr, FLAGS.log)
+			report(expect, predict, "   Model: "+name+"\nTraining: "+train_descr+
+				"\n Testing: "+test_descr + adv, FLAGS.log)
 			return test
 			
 		
