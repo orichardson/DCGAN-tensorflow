@@ -232,7 +232,7 @@ if __name__ == '__main__':
 
 	print("ALL DATA LOADED\n" + '*'*50)
 	
-	for name, learner in (linsvc, net):
+	for name, learner in (linsvc(), net()):
 		print("learner: ", name)
 
 			   
