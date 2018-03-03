@@ -221,7 +221,7 @@ if __name__ == '__main__':
 		elif datasetname == 'mnist':
 			from keras.datasets import mnist
 			return mnist.load_data()
-		elif datasetname == 'cifar10':
+		elif datasetname == 'cifar':
 			from keras.datasets import cifar10
 			return cifar10.load_data()
 
@@ -233,7 +233,7 @@ if __name__ == '__main__':
 		base = './data/'+datasetname
 		for slabel in os.listdir(base):
 			for mode in 'train', 'test':
-				base2 = base + '/' + slabel+ '/ ' + mode
+				base2 = base + '/' + slabel+ '/' + mode
 				for imgfn in os.listdir(base2):
 					x = imread(base2+"/"+imgfn)
 					Xs[mode].append(x)
