@@ -210,8 +210,8 @@ if __name__ == '__main__':
 
 		for idx, imagename in enumerate(os.listdir(datapath+'/'+f+'/split')):
 			# silly test optimization, force smaller data.			
-			#if idx > EXAMPLES_PER_CLASS:
-			#	break;
+			if idx > N_EXAMPLES / nlabels:
+				break;
 
 			# VERY IMPORTANT. This next line makes sure shitty training things from 
 			# early on in the GAN process are not reused.
@@ -225,7 +225,8 @@ if __name__ == '__main__':
 	np.random.shuffle(X_gen)
 	np.random.shuffle(Y_gen)
 	gen = (X_gen, Y_gen, datasetname + '-gen-' + gen_method)
-	gen_small = sample(gen, N_EXAMPLES)
+	#gen_small = sample(gen, N_EXAMPLES)
+	gen_small = gen
 	
 	gen_small_train, gen_small_test = ttsplit(*gen_small, 0.7)
 
