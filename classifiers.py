@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Created on Sat Mar  3 08:04:37 2018
+
+@author: Oliver
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Classifiers
 
 Created on Fri Mar	2 05:18:46 2018
@@ -158,6 +165,13 @@ def both(data1, data2):
 				name = begin+'-all'
 	
 	return np.concatenate((X1, X2), axis=0), np.concatenate((Y1, Y2), axis=0), name
+
+def shuffle(data):
+	X, Y, n = data
+	idx = np.arange(X.shape[0])
+	np.random.shuffle(idx)
+	return X[idx], Y[idx], '§'+n
+
 	
 if __name__ == '__main__':
 	import scipy.misc
@@ -225,9 +239,8 @@ if __name__ == '__main__':
 			
 	X_gen = np.array(Xs)
 	Y_gen = np.array(Ys)
-	np.random.shuffle(X_gen)
-	np.random.shuffle(Y_gen)
 	gen = (X_gen, Y_gen, datasetname + '-gen-' + gen_method)
+	shuffle(gen)
 	#gen_small = sample(gen, N_EXAMPLES)
 	gen_small = gen
 	

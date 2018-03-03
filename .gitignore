@@ -5,7 +5,7 @@ samples
 logs
 test*
 *.model
-record.txt
+record*.txt
 web/js/gen_layers.js
 
 # checkpoint
