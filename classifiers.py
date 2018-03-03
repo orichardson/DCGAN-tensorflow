@@ -9,141 +9,157 @@ Created on Fri Mar	2 05:18:46 2018
 import sys
 import os
 from sklearn import svm, metrics   
-from sklearn.decomposition import PCA
-from sklearn.pipeline import Pipeline
-from sklearn.model_selection import GridSearchCV
-from sklearn.linear_model import LogisticRegression
+#from sklearn.decomposition import PCA
+#from sklearn.pipeline import Pipeline
+#from sklearn.model_selection import GridSearchCV
+#from sklearn.linear_model import LogisticRegression
 
-from sklearn.ensemble import BaggingClassifier, RandomForestClassifier
-from sklearn.multiclass import OneVsRestClassifier
+#from sklearn.ensemble import BaggingClassifier, RandomForestClassifier
+#from sklearn.multiclass import OneVsRestClassifier
 
 import numpy as np
-import datetime
+#import datetime
 
 
-def report(expected, predicted, classifier, message='') :
+def report(expected, predicted, message='', outfile = './record.txt') :
 	creport = metrics.classification_report(expected, predicted)
-	print("Classification report for classifier %s:\n%s\n" % (classifier, creport))
+	print(message)
+	print("Classification report:\n%s\n" % (creport))
 	print("Confusion matrix:\n%s" % metrics.confusion_matrix(expected, predicted)) 
 	
-	with open('./record.txt', 'a') as log:
+	with open(outfile, 'a') as log:
 		log.write('\n' + ('*'*50) +'\n'+message+'\n\n'+ creport)
  
 	return metrics.accuracy_score(expected, predicted)
 	
-def pcasvc( dataset , logmessage=""):
-	(x_train, y_train), (x_test, y_test) = dataset
-	
-	assert(x_train.shape[0] == y_train.shape[0])
-	assert(x_test.shape[0] == y_test.shape[0])
-	
-	# turn the data in a (samples, feature) matrix:
-	
-	x_train = x_train.reshape((y_train.shape[0], -1))
-	x_test = x_test.reshape((y_test.shape[0], -1))
-	
-	print('SVC: data ready', x_train.shape, y_train.shape, x_test.shape, y_test.shape)
-	
-
-	classifier = svm.LinearSVC()
-	#classifier = Pipeline([('pca', PCA(n_components = dim_latent)), ('log', LogisticRegression())], verbose=True);
-	#  too long
-	#	classifier = OneVsRestClassifier(BaggingClassifier(svm.SVC(kernel='linear'),
-	#					max_samples=1.0 / n_estimators, n_estimators=n_estimators))
+def build(pre, modeler, post, name):
+	def train(x_train_raw, y_train_raw, train_descr):	
+		x_train,y_train, params = pre(x_train_raw, y_train_raw)
+		print(name, ' -- train data ready. ', x_train.shape, y_train.shape)
 		
+		clf = modeler(x_train, y_train, **params)
+		print(name, ' -- train data fit.')
 		
-	# We learn the digits on the first half of the digits
-	classifier.fit(x_train, y_train)
-	print('SVC: data fit')
+		def test(x_test_raw, y_test_raw, test_descr):
+			x_test, y_test = pre(x_test_raw, y_test_raw)
 	
-	# Now predict the value of the digit on the second half:
-	expected = y_test
-	predicted = classifier.predict(x_test)
-	print('SVC: data predicted')
+			predict = post(clf.predict(x_test))
+			expect = post(y_test)
+			
+			print(name, ' -- test data predicted')
+			
+			report(expect, predict, "Training: "+train_descr+"\n Testing: "+test_descr, './record-'+name+'.txt')
+			return test
+			
+		
+		test.test = test
+		return test
+		
+	train.train = train
+	return name, train
+	
+def linsvc():
+	def pre(X, Y):
+		assert(X.shape[0] == Y.shape[0])
+		return X.reshape((Y.shape[0], -1)), Y, {}
 
-	report(expected, predicted, classifier, logmessage)  
+	def post(Y):
+		return Y
+
+	def modeler(X, Y):	
+		classifier = svm.LinearSVC()	
+		#classifier = Pipeline([('pca', PCA(n_components = dim_latent)), ('log', LogisticRegression())], verbose=True);
+		#####  too long
+		#classifier = OneVsRestClassifier(BaggingClassifier(svm.SVC(kernel='linear'),
+		#				max_samples=1.0 / n_estimators, n_estimators=n_estimators))
+		classifier.fit(X, Y)
+	
+	
+	return build(pre, modeler, post, "lin-svc")
 
 
-def net( dataset , logmessage="" ):
+def net():
 	import keras
 	from keras.models import Sequential
 	from keras.layers import Dense, Dropout, Flatten
 	from keras.layers import Conv2D, MaxPooling2D
 	from keras import backend as K
 
-	(x_train, y_train), (x_test, y_test) = dataset
 	
-	batch_size = 128
-	num_classes = 10
-	epochs = 12
-	# input image dimensions
-	img_rows, img_cols = 28, 28    
-	
-	if K.image_data_format() == 'channels_first':
-		x_train = x_train.reshape(x_train.shape[0], 1, img_rows, img_cols)
-		x_test = x_test.reshape(x_test.shape[0], 1, img_rows, img_cols)
-		input_shape = (1, img_rows, img_cols)
-	else:
-		x_train = x_train.reshape(x_train.shape[0], img_rows, img_cols, 1)
-		x_test = x_test.reshape(x_test.shape[0], img_rows, img_cols, 1)
-		input_shape = (img_rows, img_cols, 1)
-	
-	x_train = x_train.astype('float32')
-	x_test = x_test.astype('float32')
-	x_train /= 255
-	x_test /= 255
-#	 print('x_train shape:', x_train.shape)
-#	 print(x_train.shape[0], 'train samples')
-#	print(x_test.shape[0], 'test samples')
-	
-	# convert class vectors to binary class matrices
-	y_train = keras.utils.to_categorical(y_train, num_classes)
-	y_test = keras.utils.to_categorical(y_test, num_classes)
-	
-	
-	print('net: data ready')
+	def pre(X, Y):	
+		num_classes = 10
+		# input image dimensions
+		img_rows, img_cols = 28, 28    
 
+		input_shape = (1, img_rows, img_cols) if K.image_data_format() == 'channels_first' else (img_rows, img_cols, 1)
+		X = X.reshape(X.shape[0], *input_shape)
+		X = X.astype('float32')
+		X /= 255
+		
+		Y = keras.utils.to_categorical(Y, num_classes)
+		return X, Y, dict(num_classes=num_classes, input_shape=input_shape)
 	
-	model = Sequential()
-	model.add(Conv2D(32, kernel_size=(3, 3),
-					 activation='relu',
-					 input_shape=input_shape))
-	model.add(Conv2D(64, (3, 3), activation='relu'))
-	model.add(MaxPooling2D(pool_size=(2, 2)))
-	model.add(Dropout(0.25))
-	model.add(Flatten())
-	model.add(Dense(128, activation='relu'))
-	model.add(Dropout(0.5))
-	model.add(Dense(num_classes, activation='softmax'))
 	
-	model.compile(loss=keras.losses.categorical_crossentropy,
-				  optimizer=keras.optimizers.Adadelta(),
-				  metrics=['accuracy'])
-	print('net: model constructed')
+	def modeler(X, Y, **params):
+		epochs = 12
+		batch_size = 128
 
-	model.fit(x_train, y_train,
-			  batch_size=batch_size,
-			  epochs=epochs,
-			  verbose=1,
-			  validation_data=(x_test, y_test))
-	print('net: model trained')
+		model = Sequential()
+		model.add(Conv2D(32, kernel_size=(3, 3),
+						 activation='relu',
+						 input_shape=params['input_shape']))
+		model.add(Conv2D(64, (3, 3), activation='relu'))
+		model.add(MaxPooling2D(pool_size=(2, 2)))
+		model.add(Dropout(0.25))
+		model.add(Flatten())
+		model.add(Dense(128, activation='relu'))
+		model.add(Dropout(0.5))
+		model.add(Dense(params['num_classes'], activation='softmax'))
+		
+		model.compile(loss=keras.losses.S,
+					  optimizer=keras.optimizers.Adadelta(),
+					  metrics=['accuracy'])
+	
+		model.fit(X, Y,
+				  batch_size=batch_size,
+				  epochs=epochs,
+				  verbose=1,
+				  validation_split=0.1)
+		return model
+	
+	def post(Y):
+		return Y.argmax(axis=1)
 
-	 
-	#model.save('keras-mnist'+str(int(datetime.datetime.now().timestamp()))+'.model')
-	y_pred_soft = model.predict(x_test)
-	y_pred_hard = y_pred_soft.argmax(axis=1)
-	y_test_hard = y_test.argmax(axis=1)
-	#print(y_pred_soft.shape, y_pred_hard.shape, y_test.shape, y_pred_hard.dtype, y_test.dtype)
-	#print(y_pred_hard)
-	#print(y_test)
+	return build(pre, modeler, post, "cnet")
 	
+def sample(dataset, number):
+	xs, ys, name = dataset
+	indices = np.array(np.random.randint(xs.shape[0], size=number))
+	return xs[indices], ys[indices], name+'-mini'+number
 	
-	report(y_test_hard, y_pred_hard, model, logmessage)
+def ttsplit(X,Y, name, prc):
+	n = int(prc * X.shape[0])
+	return (X[:n], Y[:n], name+'-train'), (X[n:], Y[n:], name+'-test')
+
+def both(data1, data2):
+	X1, Y1, n1 = data1
+	X2, Y2, n2 = data2
+	
+	sfx = ['-train', '-test']
+	
+	name = n1 +'&'+ n2
+	for a, b in (sfx, reversed(sfx)):
+		if n1.endswith(a):
+			begin = n1[:-len(a)]
+			if n2 == begin+b:
+				name = begin+'-all'
+	
+	return np.concatenate((X1, X2), axis=0), np.concatenate((Y1, Y2), axis=0), name
 	
 if __name__ == '__main__':
 	import scipy.misc
 	
-	EXAMPLES_PER_CLASS = 1000
+	N_EXAMPLES = 10000
 	
 	# Questions
 	# HOw well trained on this test on original
@@ -157,6 +173,7 @@ if __name__ == '__main__':
 	# /sampledir/fashion-n/split/...
 
 	datasetname = sys.argv[1]
+	gen_method = sys.argv[2]
 	# First load original dataset
 	
 	def getoriginaldata():
@@ -169,18 +186,18 @@ if __name__ == '__main__':
 			return mnist.load_data()
 		raise ValueError('what is '+datasetname+'??')
 		
-		 
 	(xtrain, ytrain), (xtest, ytest) = getoriginaldata()
 	nlabels = len(set(ytest))
+	
+	stand_train = xtrain, ytrain, 'standard-'+datasetname+'-train'
+	stand_test = xtest, ytest, 'standard-'+datasetname+'-test'
 
 	X_stand = np.concatenate((xtrain, xtest), axis=0)
 	Y_stand = np.concatenate((ytrain, ytest), axis=0)
-	stand = (X_stand, Y_stand)
-	stand_train = (xtrain, ytrain)
+	stand_all = X_stand, Y_stand, 'standard-'+datasetname+'-all'
 	
-	indices = np.array(np.random.randint(xtrain.shape[0], size=EXAMPLES_PER_CLASS*nlabels))
-	stand_train = xtrain[indices], ytrain[indices]
-	#stand_train = stand_train[EXAMPLES_PER_CLASS*nlabels:]
+	stand_train_small = sample(stand_train, N_EXAMPLES),
+	stand_test_small = sample(stand_test, N_EXAMPLES)
   
 	Xs = []
 	Ys = []
@@ -193,8 +210,8 @@ if __name__ == '__main__':
 
 		for idx, imagename in enumerate(os.listdir(datapath+'/'+f+'/split')):
 			# silly test optimization, force smaller data.			
-			if idx > EXAMPLES_PER_CLASS:
-				break;
+			#if idx > EXAMPLES_PER_CLASS:
+			#	break;
 
 			# VERY IMPORTANT. This next line makes sure shitty training things from 
 			# early on in the GAN process are not reused.
@@ -205,23 +222,28 @@ if __name__ == '__main__':
 			
 	X_gen = np.array(Xs)
 	Y_gen = np.array(Ys)
-	gen = (X_gen, Y_gen)
-
+	np.random.shuffle(X_gen)
+	np.random.shuffle(Y_gen)
+	gen = (X_gen, Y_gen, datasetname + '-gen-' + gen_method)
+	gen_small = sample(gen, N_EXAMPLES)
 	
-	print("x-gen", X_gen.shape)
-	print("y-gen", Y_gen.shape)
+	gen_small_train, gen_small_test = ttsplit(*gen_small, 0.7)
 
-	for model in [pcasvc, net]:
-		print("MODEL", model)
-		mstr = str(type(model))
+	print("ALL DATA LOADED\n" + '*'*50)
+	
+	for name, learner in (linsvc, net):
+		print("learner: ", name)
+
 			   
-		model( (gen, stand_train), mstr+" train on gen, test on standard for "+datasetname)
-		model( (stand_train, gen), mstr+" train on stand, test on gen for "+datasetname)
+		# train on gen, test on standard_all 
+		learner.train(gen_small_train) \
+			.test(stand_train_small)(stand_test_small)(gen_small_test)
+			
+		learner.train(stand_train_small) \
+			.test(stand_test_small)(gen_small_test)(gen_small)
+			
+		learner.train(gen_small)
 		
-		ntrain = int(0.7 * X_gen.shape[0])
-		model( ((X_gen[:ntrain], Y_gen[:ntrain]), (X_gen[ntrain:], Y_gen[ntrain:])),
-			  mstr+" train on gen, test on gen for "+datasetname)
-
 		  
 		
 		
