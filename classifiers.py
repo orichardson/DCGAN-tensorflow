@@ -108,12 +108,13 @@ def net():
 
 	
 	def pre(X, Y):	
-		num_classes = 10
+		num_classes = len(set(Y))
 		# input image dimensions
-		img_rows, img_cols = 28, 28    
-
-		input_shape = (1, img_rows, img_cols) if K.image_data_format() == 'channels_first' else (img_rows, img_cols, 1)
-		X = X.reshape(X.shape[0], *input_shape)
+		#img_rows, img_cols = 28, 28
+		#chan = 
+		#input_shape = (chan, img_rows, img_cols) if K.image_data_format() == 'channels_first' else (img_rows, img_cols, chan)
+		input_shape = X.shape[1:]
+		# X = X.reshape(X.shape[0], *input_shape)
 		X = X.astype('float32')
 		X /= 255
 		
