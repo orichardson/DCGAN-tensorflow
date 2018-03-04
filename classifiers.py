@@ -255,24 +255,26 @@ if __name__ == '__main__':
 	Xs = []
 	Ys = []
 	
-	datapath = './samples' 
-	# datapath = './samples/'+gen_method
+	#datapath = './samples' 
+	datapath = './samples/'+gen_method
 	folders = [f for f in os.listdir(datapath) if f.startswith(datasetname+'-')]
 	
 	for f in folders:
 		label = int(f[len(datasetname)+1:])
+		
+		extra = '/split' if 'split' in  os.listdir(datapath+'/'+f) else ''			
 
-		for idx, imagename in enumerate(os.listdir(datapath+'/'+f+'/split')):
+		for idx, imagename in enumerate(os.listdir(datapath+'/'+f+extra)):
 			# silly test optimization, force smaller data.			
 			if idx > N_EXAMPLES / nlabels:
 				break;
 
 			# VERY IMPORTANT. This next line makes sure shitty training things from 
 			# early on in the GAN process are not reused.
-			if ('test' in imagename):
-				dataX = scipy.misc.imread(datapath+'/'+f+'/split/'+imagename)
-				Xs.append(dataX)
-				Ys.append(label)
+#			if ('test' in imagename):
+			dataX = scipy.misc.imread(datapath+'/'+f+extra+'/'+imagename)
+			Xs.append(dataX)
+			Ys.append(label)
 			
 	X_gen = np.array(Xs)
 	Y_gen = np.array(Ys)
