@@ -142,7 +142,7 @@ if __name__ == '__main__':
 				resize_height=h,
 				resize_width=w,
 				crop=FLAGS.crop) for sample_file in filelist]).reshape(-1, w*h)
-	
+	print('images of shape:', images.shape)
 	model.fit(images)
 	
 	# Test the trained model: generation
@@ -160,5 +160,6 @@ if __name__ == '__main__':
 		for j in range(n):
 			im = x_generated[i*n+j, :].reshape(28, 28)
 			I_generated[i*h:(i+1)*h, j*w:(j+1)*w] = im
+			print(im.shape)
 			scipy.misc.imsave(im, './vae-out/im%d.jpg' % counter)
 			counter += 1
