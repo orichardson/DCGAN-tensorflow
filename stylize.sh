@@ -6,13 +6,13 @@ NLABELS=$3
 for ((i=0;i<NLABELS;i++)); do 
 
 	printf $"******* Label $i ************"
-	mkdir -p ../DCGAN-tensorflow/samples/styl-$STYLE_NAME/$i
-	echo made ../DCGAN-tensorflow/samples/styl-$STYLE_NAME/$i
+	mkdir -p ../DCGAN-tensorflow/samples/styl-$STYLE_NAME/$DATASET-$i
+	echo made ../DCGAN-tensorflow/samples/styl-$STYLE_NAME/$DATASET-$i
 	
-	python evaluate.py --checkpoint style-models/styl-$STYLE_NAME \
+	python evaluate.py --checkpoint style-models/$STYLE_NAME.ckpt \
 		--in-path ../DCGAN-tensorflow/data/$DATASET/$i/train/ \
 		--out-path ../DCGAN-tensorflow/samples/styl-$STYLE_NAME/$DATASET-$i
-	echo evaluate.py --checkpoint style-models/styl-$STYLE_NAME \
+	echo evaluate.py --checkpoint style-models/$STYLE_NAME.ckpt \
 		--in-path ../DCGAN-tensorflow/data/$DATASET/$i/train/ \
 		--out-path ../DCGAN-tensorflow/samples/styl-$STYLE_NAME/$DATASET-$i
 		
