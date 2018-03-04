@@ -30,8 +30,8 @@ class VariantionalAutoencoder(object): #(BaseEstimator, ClusterMixin):
 
 	# Build the netowrk and the loss functions
 	def build(self):
-		n_x = self.tiers[0]
-		n_z = self.tiers[-1]
+		n_x = self.insize
+		n_z = self.nz
 		self.x = tf.placeholder(name='x', dtype=tf.float32, shape=[None, n_x])
 
 		# Encode
