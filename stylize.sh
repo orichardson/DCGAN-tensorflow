@@ -5,7 +5,7 @@ NLABELS=$3
 
 for ((i=0;i<NLABELS;i++)); do 
 
-	printf $"******* Label $i ************"
+	printf "\n******* Label $i ************\n\n"
 	mkdir -p ../DCGAN-tensorflow/samples/styl-$STYLE_NAME/$DATASET-$i
 	echo made ../DCGAN-tensorflow/samples/styl-$STYLE_NAME/$DATASET-$i
 	
