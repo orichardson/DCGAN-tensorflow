@@ -128,6 +128,8 @@ if __name__ == '__main__':
 
 	w = FLAGS.input_width
 	h = FLAGS.input_height
+	if h is None:
+		h = w
 
 	model = VariantionalAutoencoder(n_z = 5)
 
