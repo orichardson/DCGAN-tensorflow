@@ -8,16 +8,20 @@ https://github.com/shaohua0116/VAE-Tensorflow/blob/master/demo.py
 from tensorflow.contrib.slim import fully_connected as fc
 import tensorflow as tf
 
-#from sklearn.base import BaseEstimator, ClassifierMixin
+from sklearn.base import BaseEstimator, ClusterMixin
+
+from split import ensure_directory
 
 
-class VariantionalAutoencoder(object):
-	def __init__(self, n_z=10, insize=784, midsizes=[512,384,256], learning_rate=1e-3, batch_size=100):
+class VariantionalAutoencoder(BaseEstimator, ClusterMixin):
+	def __init__(self, n_z=10, insize=784, midsizes=[512,384,256], learning_rate=1e-3, batch_size=100, num_epoch=10):
 		self.learning_rate = learning_rate
 		self.batch_size = batch_size
+		self.num_epoch = num_epoch		
 		
 		self.n_z = n_z
 		self.insize = insize
+		
 
 		self.build()
 
@@ -71,11 +75,6 @@ class VariantionalAutoencoder(object):
 			learning_rate=self.learning_rate).minimize(self.total_loss)
 		return
 
-	# Execute the forward and the backward pass
-	def run_single_step(self, x):
-		
-		return loss, recon_loss, latent_loss
-
 	# x -> x_hat
 	def reconstructor(self, x):
 		x_hat = self.sess.run(self.x_hat, feed_dict={self.x: x})
@@ -93,7 +92,7 @@ class VariantionalAutoencoder(object):
 		
 	def fit(self, X, Y):
 		num_samples = X.shape[0]
-		for epoch in range(num_epoch):
+		for epoch in range(self.num_epoch):
 			for i in range(0, num_samples, self.batch_size): # for each batch (not each image)
 				batch = X[i:i+self.batch_size]
 				# Execute the forward and the backward pass and report computed losses
@@ -105,5 +104,35 @@ class VariantionalAutoencoder(object):
 			if epoch % 5 == 0:
 				print('[Epoch {}] Loss: {}, Recon loss: {}, Latent loss: {}'.format(
 					epoch, loss, recon_loss, latent_loss))
+		print('Done!')
 
 
+flags = tf.app.flags
+flags.DEFINE_string("dataset", "mnist", "The name of dataset [mnist, fashion,cifar]")
+FLAGS = flags.FLAGS
+
+
+if __name__ == '__main__':
+	import numpy as np
+	import scipy.misc
+	model = VariantionalAutoencoder(n_z = 5)
+	
+	w,h = 28,28
+	
+	# Test the trained model: generation
+	# Sample noise vectors from N(0, 1)
+	z = np.random.normal(size=[model.batch_size, model.n_z])
+	x_generated = model.generator(z)
+	
+	ensure_directory('./vae-out')
+	
+	n = np.sqrt(model.batch_size).astype(np.int32)
+	I_generated = np.empty((h*n, w*n))
+	
+	counter = 0
+	for i in range(n):
+		for j in range(n):
+			im = x_generated[i*n+j, :].reshape(28, 28)
+			I_generated[i*h:(i+1)*h, j*w:(j+1)*w] = im
+			scipy.misc.imsave(im, './vae-out/im%d.jpg' % counter)
+			counter += 1
