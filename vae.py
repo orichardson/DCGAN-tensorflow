@@ -133,6 +133,7 @@ if __name__ == '__main__':
 
 	
 	filelist = glob(os.path.join("./data", FLAGS.dataset_name, FLAGS.input_fname_pattern))
+	print(next(iter(filelist)))
 	images = np.array([get_image(sample_file,
 				input_height=h,
 				input_width=w,
