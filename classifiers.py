@@ -261,7 +261,8 @@ if __name__ == '__main__':
 	Xs = []
 	Ys = []
 	
-	datapath = './samples'
+	datapath = './samples' 
+	# datapath = './samples/'+gen_method
 	folders = [f for f in os.listdir(datapath) if f.startswith(datasetname+'-')]
 	
 	for f in folders:

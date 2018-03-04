@@ -8,12 +8,12 @@ https://github.com/shaohua0116/VAE-Tensorflow/blob/master/demo.py
 from tensorflow.contrib.slim import fully_connected as fc
 import tensorflow as tf
 
-from sklearn.base import BaseEstimator, ClusterMixin
+#from sklearn.base import BaseEstimator, ClusterMixin
 
 from split import ensure_directory
 
 
-class VariantionalAutoencoder(BaseEstimator, ClusterMixin):
+class VariantionalAutoencoder(object): #(BaseEstimator, ClusterMixin):
 	def __init__(self, n_z=10, insize=784, midsizes=[512,384,256], learning_rate=1e-3, batch_size=100, num_epoch=10):
 		self.learning_rate = learning_rate
 		self.batch_size = batch_size
@@ -90,7 +90,7 @@ class VariantionalAutoencoder(BaseEstimator, ClusterMixin):
 		z = self.sess.run(self.z, feed_dict={self.x: x})
 		return z
 		
-	def fit(self, X, Y):
+	def fit(self, X):
 		num_samples = X.shape[0]
 		for epoch in range(self.num_epoch):
 			for i in range(0, num_samples, self.batch_size): # for each batch (not each image)
@@ -108,16 +108,39 @@ class VariantionalAutoencoder(BaseEstimator, ClusterMixin):
 
 
 flags = tf.app.flags
-flags.DEFINE_string("dataset", "mnist", "The name of dataset [mnist, fashion,cifar]")
+flags.DEFINE_string("sample_dir", "samples", "Directory name to save the image samples [samples]")
+flags.DEFINE_string("dataset_name", "mnist", "The name of dataset [celebA, mnist, lsun]")
+flags.DEFINE_string('input_fname_pattern', '*.jpg', 'descriptor for files')
+flags.DEFINE_integer("input_height", 28, "The size of image to use (will be center cropped). [108]")
+flags.DEFINE_integer("input_width", None, "The size of image to use (will be center cropped). If None, same value as input_height [None]")
+
+flags.DEFINE_boolean("crop", False, "True for training, False for testing [False]")
+
 FLAGS = flags.FLAGS
 
 
 if __name__ == '__main__':
 	import numpy as np
 	import scipy.misc
+	import os	
+	from glob import glob
+	from utils import get_image
+
+	w = FLAGS.input_width
+	h = FLAGS.input_height
+
 	model = VariantionalAutoencoder(n_z = 5)
+
 	
-	w,h = 28,28
+	filelist = glob(os.path.join("./data", FLAGS.dataset_name, FLAGS.input_fname_pattern))
+	images = np.array([get_image(sample_file,
+				input_height=h,
+				input_width=w,
+				resize_height=h,
+				resize_width=w,
+				crop=FLAGS.crop) for sample_file in filelist])
+	
+	model.fit(images)
 	
 	# Test the trained model: generation
 	# Sample noise vectors from N(0, 1)
