@@ -207,16 +207,16 @@ if __name__ == '__main__':
 	
 	def getoriginaldata():
 		# I suspsect these might be faster which is why I've left them in.		
-		if datasetname == 'fashion':
-			from keras.datasets import fashion_mnist
-			return fashion_mnist.load_data()
-			
-		elif datasetname == 'mnist':
-			from keras.datasets import mnist
-			return mnist.load_data()
-		elif datasetname == 'cifar':
-			from keras.datasets import cifar10
-			return cifar10.load_data()
+#		if datasetname == 'fashion':
+#			from keras.datasets import fashion_mnist
+#			return fashion_mnist.load_data()
+#			
+#		elif datasetname == 'mnist':
+#			from keras.datasets import mnist
+#			return mnist.load_data()
+#		elif datasetname == 'cifar':
+#			from keras.datasets import cifar10
+#			return cifar10.load_data()
 
 		from scipy.misc import imread
 
