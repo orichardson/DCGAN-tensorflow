@@ -131,7 +131,7 @@ if __name__ == '__main__':
 	if h is None:
 		h = w
 
-	model = VariantionalAutoencoder(n_z = 5)
+	model = VariantionalAutoencoder(n_z = 5, insize=w*h)
 
 	
 	filelist = glob(os.path.join("./data", FLAGS.dataset_name, FLAGS.input_fname_pattern))
@@ -141,7 +141,7 @@ if __name__ == '__main__':
 				input_width=w,
 				resize_height=h,
 				resize_width=w,
-				crop=FLAGS.crop) for sample_file in filelist])
+				crop=FLAGS.crop) for sample_file in filelist]).reshape(-1, w*h)
 	
 	model.fit(images)
 	
