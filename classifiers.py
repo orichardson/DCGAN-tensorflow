@@ -1,12 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Mar  3 08:04:37 2018
-
-@author: Oliver
-"""
-
-# -*- coding: utf-8 -*-
-"""
 Classifiers
 
 Created on Fri Mar	2 05:18:46 2018
@@ -233,7 +226,7 @@ if __name__ == '__main__':
 		base = './data/'+datasetname
 		for slabel in os.listdir(base):
 			for mode in 'train', 'test':
-				base2 = base + '/' + slabel+ '/ ' + mode
+				base2 = base + '/' + slabel+ '/' + mode
 				for imgfn in os.listdir(base2):
 					x = imread(base2+"/"+imgfn)
 					Xs[mode].append(x)
