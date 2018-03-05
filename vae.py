@@ -177,12 +177,11 @@ if __name__ == '__main__':
 	
 	model = VariantionalAutoencoder(n_z = 10, insize=w*h)
 	images = np.array([imread(sample_file)[border_r:border_r+h,border_r:border_r+w] \
-		for sample_file in filelist]).reshape(-1, w*h)
-
+		for sample_file in filelist]).reshape(-1, w*h).astype(float)
 	
 			
 	print('images of shape:', images.shape)
-	images = (images/255).astype(float)
+	images = (images.astype(float))/255.0
 	print('range of image values: ', images.min(), images.max())
 	model.fit(images)
 	
