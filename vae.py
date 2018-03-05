@@ -195,11 +195,11 @@ if __name__ == '__main__':
 		for i in range(n):
 			for j in range(n):
 				im = x_generated[i*n+j, :].reshape(w, h)
-				scipy.misc.imsave(FLAGS.sample_dir+'/split/im%d'%counter, im) 
+				scipy.misc.imsave(FLAGS.sample_dir+'/split/im%d.png'%counter, im) 
 				I_generated[i*h:(i+1)*h, j*w:(j+1)*w] = im
 				#'./samples/vae/%s-%s/split/im%d.jpg' % (flags.dataset, label, counter)
 				counter += 1
 				
-		scipy.misc.imsave(FLAGS.sample_dir+'/amalg%d'%kk, I_generated)
+		scipy.misc.imsave(FLAGS.sample_dir+'/amalg%d.png'%kk, I_generated)
 
 	print("********** done *********")
