@@ -143,6 +143,8 @@ if __name__ == '__main__':
 				resize_width=w,
 				crop=FLAGS.crop) for sample_file in filelist]).reshape(-1, w*h)
 	print('images of shape:', images.shape)
+	print('range of image values: ', images.min(), images.max())
+	images /= 255
 	model.fit(images)
 	
 	# Test the trained model: generation
