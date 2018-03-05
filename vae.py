@@ -26,7 +26,7 @@ class VariantionalAutoencoder(object): #(BaseEstimator, ClusterMixin):
 		
 		self.n_z = n_z
 		self.insize = insize
-		
+			
 
 		self.build()
 
@@ -122,6 +122,7 @@ class VariantionalAutoencoder(object): #(BaseEstimator, ClusterMixin):
 				)
 				
 				if np.isnan(loss):
+					print("************** NAN DETECTED **************")
 					print('batch range: ', batch.min(), batch.max())
 					print('batch size: ', batch.shape)
 					G = globals()
@@ -208,6 +209,6 @@ if __name__ == '__main__':
 				#'./samples/vae/%s-%s/split/im%d.jpg' % (flags.dataset, label, counter)
 				counter += 1
 				
-		scipy.misc.imsave(FLAGS.sample_dir+'/amalg%d.pngx'%kk, I_generated)
+		scipy.misc.imsave(FLAGS.sample_dir+'/amalg%d.png'%kk, I_generated)
 
 	print("********** done *********")
