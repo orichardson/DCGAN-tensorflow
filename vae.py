@@ -14,10 +14,14 @@ from split import ensure_directory
 
 
 class VariantionalAutoencoder(object): #(BaseEstimator, ClusterMixin):
-	def __init__(self, n_z=10, insize=784, midsizes=[512,384,256], learning_rate=1e-3, batch_size=100, num_epoch=100):
+	def __init__(self, n_z=10, insize=784, midsizes=None, learning_rate=1e-3, batch_size=100, num_epoch=100):
 		self.learning_rate = learning_rate
 		self.batch_size = batch_size
-		self.num_epoch = num_epoch		
+		self.num_epoch = num_epoch
+		
+		if midsizes is None:
+			midsizes = np.array([512,384,256],dtype=int) # * insize // 784 # scale inner layers to input
+		self.midsizes = midsizes
 		
 		self.n_z = n_z
 		self.insize = insize
@@ -36,21 +40,36 @@ class VariantionalAutoencoder(object): #(BaseEstimator, ClusterMixin):
 
 		# Encode
 		# x -> z_mean, z_sigma -> z
-		f1 = fc(self.x, 512, scope='enc_fc1', activation_fn=tf.nn.elu)
-		f2 = fc(f1, 384, scope='enc_fc2', activation_fn=tf.nn.elu)
-		f3 = fc(f2, 256, scope='enc_fc3', activation_fn=tf.nn.elu)
-		self.z_mu = fc(f3, n_z, scope='enc_fc4_mu', activation_fn=None)
-		self.z_log_sigma_sq = fc(f3, n_z, scope='enc_fc4_sigma', activation_fn=None)
+		# f1 = fc(self.x, 512, scope='enc_fc1', activation_fn=tf.nn.elu)
+		# f2 = fc(f1, 384, scope='enc_fc2', activation_fn=tf.nn.elu)
+		# f3 = fc(f2, 256, scope='enc_fc3', activation_fn=tf.nn.elu)
+		
+		prev = self.x
+		for li, size in enumerate(self.midsizes):
+			fl = fc(prev, size, scope='enc_fc'+str(li), activation_fn=tf.nn.elu)
+			prev = fl
+			
+		li += 1
+		
+		self.z_mu = fc(prev, n_z, scope='enc_fc%d_mu' % li , activation_fn=None)
+		self.z_log_sigma_sq = fc(f3, n_z, scope='enc_fc%d_sigma' % li, activation_fn=None)
 		eps = tf.random_normal(shape=tf.shape(self.z_log_sigma_sq),
 							   mean=0, stddev=1, dtype=tf.float32)
 		self.z = self.z_mu + tf.sqrt(tf.exp(self.z_log_sigma_sq)) * eps
 
 		# Decode
 		# z -> x_hat
-		g1 = fc(self.z, 256, scope='dec_fc1', activation_fn=tf.nn.elu)
-		g2 = fc(g1, 384, scope='dec_fc2', activation_fn=tf.nn.elu)
-		g3 = fc(g2, 512, scope='dec_fc3', activation_fn=tf.nn.elu)
-		self.x_hat = fc(g3, n_x, scope='dec_fc4', activation_fn=tf.sigmoid)
+		# g1 = fc(self.z, 256, scope='dec_fc1', activation_fn=tf.nn.elu)
+		# g2 = fc(g1, 384, scope='dec_fc2', activation_fn=tf.nn.elu)
+		# g3 = fc(g2, 512, scope='dec_fc3', activation_fn=tf.nn.elu)
+
+		prev = self.z
+		for li, size in enumerate(reversed(self.midsizes)):
+			prev = fc(prev, size, scope='enc_fc'+str(li), activation_fn=tf.nn.elu)
+
+		li += 1
+		
+		self.x_hat = fc(g3, n_x, scope='dec_fc%d' % li, activation_fn=tf.sigmoid)
 
 		# Loss
 		# Reconstruction loss
@@ -113,6 +132,7 @@ flags.DEFINE_string("dataset_name", "mnist", "The name of dataset [celebA, mnist
 flags.DEFINE_string('input_fname_pattern', '*.jpg', 'descriptor for files')
 flags.DEFINE_integer("input_height", 28, "The size of image to use (will be center cropped). [28]")
 flags.DEFINE_integer("input_width", None, "The size of image to use (will be center cropped). If None, same value as input_height [None]")
+flags.DEFINE_integer('batches_generated', 500, "Number of batches to generate")
 
 flags.DEFINE_boolean("crop", False, "True for training, False for testing [False]")
 
@@ -124,7 +144,7 @@ if __name__ == '__main__':
 	import scipy.misc
 	import os	
 	from glob import glob
-	from utils import get_image
+	#from utils import get_image
 	from scipy.misc import imread
 
 	w = FLAGS.input_width
@@ -140,7 +160,7 @@ if __name__ == '__main__':
 	model = VariantionalAutoencoder(n_z = 10, insize=w*h)
 
 	
-	filelist = glob(os.path.join("./data", FLAGS.dataset_name, FLAGS.input_fname_pattern))
+	filelist = glob(os.path.join("./data", FLAGS.dataset, FLAGS.input_fname_pattern))
 	print(next(iter(filelist)))
 	images = np.array([imread(sample_file)[border_r:border_r+h,border_r:border_r+w] \
 		for sample_file in filelist]).reshape(-1, w*h)
@@ -150,21 +170,29 @@ if __name__ == '__main__':
 	images /= 255
 	model.fit(images)
 	
-	# Test the trained model: generation
-	# Sample noise vectors from N(0, 1)
-	z = np.random.normal(size=[model.batch_size, model.n_z])
-	x_generated = model.generator(z)
 	
-	ensure_directory('./vae-out')
+	ensure_directory(FLAGS.sample_dir)
 	
 	n = np.sqrt(model.batch_size).astype(np.int32)
-	I_generated = np.empty((h*n, w*n))
 	
 	counter = 0
-	for i in range(n):
-		for j in range(n):
-			im = (x_generated[i*n+j, :].reshape(w, h)*255).astype(int)
-			I_generated[i*h:(i+1)*h, j*w:(j+1)*w] = im.reshape(w,h)
-			print(im.shape)
-			scipy.misc.imsave('./vae-out/im%d.jpg' % counter, im)
-			counter += 1
+	
+	
+	for kk in range(FLAGS.batches_generated):
+		# Test the trained model: generation
+		# Sample noise vectors from N(0, 1)
+		z = np.random.normal(size=[model.batch_size, model.n_z])
+		x_generated = (model.generator(z)*255).astype(int)
+		I_generated = np.empty((h*n, w*n))
+
+		for i in range(n):
+			for j in range(n):
+				im = x_generated[i*n+j, :].reshape(w, h)
+				scipy.misc.imsave(FLAGS.sample_dir+'/split/im%d'%counter, im) 
+				I_generated[i*h:(i+1)*h, j*w:(j+1)*w] = im
+				#'./samples/vae/%s-%s/split/im%d.jpg' % (flags.dataset, label, counter)
+				counter += 1
+				
+		scipy.misc.imsave(FLAGS.sample_dir+'/amalg%d'%kk, I_generated)
+
+	print("********** done *********")
