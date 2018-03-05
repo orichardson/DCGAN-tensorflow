@@ -29,10 +29,11 @@ flags.DEFINE_string("models", "linsvc,cnet", "the models to run")
 flags.DEFINE_bool("adversarial", False, "run adversarial attacks")
 flags.DEFINE_integer("examples", 20000, "number of examples")
 flags.DEFINE_string("log", 'record.txt' , "log file")
+flags.DEFINE_integer("epoch", -1, "number of epochs")
 FLAGS = flags.FLAGS
 
 
-def report(expected, predicted, message='', outfile = './record.txt') :
+def report(expected, predicted, message='', outfile = './results/record.txt') :
 	creport = metrics.classification_report(expected, predicted)
 	print(message)
 	print("Classification report:\n%s\n" % (creport))
@@ -68,7 +69,7 @@ def build(pre, modeler, post, name):
 			print(name, ' -- test data predicted')
 			
 			report(expect, predict, "   Model: "+name+"\nTraining: "+train_descr+
-				"\n Testing: "+test_descr + adv, FLAGS.log)
+				"\n Testing: "+test_descr + adv, './results/'+FLAGS.log+'.txt')
 			return test
 			
 		
@@ -262,7 +263,12 @@ if __name__ == '__main__':
 	for f in folders:
 		label = int(f[len(datasetname)+1:])
 		
-		extra = '/split' if 'split' in  os.listdir(datapath+'/'+f) else ''			
+		extra = ''
+		if FLAGS.epoch > 0:
+			extra += '/epoch-%d'
+			
+		if 'split' in  os.listdir(datapath+'/'+f + extra) :
+			extra += '/split'			
 
 		for idx, imagename in enumerate(os.listdir(datapath+'/'+f+extra)):
 			# silly test optimization, force smaller data.			
