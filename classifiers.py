@@ -265,7 +265,7 @@ if __name__ == '__main__':
 		
 		extra = ''
 		if FLAGS.epoch > 0:
-			extra += '/epoch-%d'
+			extra += '/epoch-%d' % FLAGS.epoch
 			
 		if 'split' in  os.listdir(datapath+'/'+f + extra) :
 			extra += '/split'			
