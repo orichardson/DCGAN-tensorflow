@@ -14,7 +14,7 @@ from split import ensure_directory
 
 
 class VariantionalAutoencoder(object): #(BaseEstimator, ClusterMixin):
-	def __init__(self, n_z=10, insize=784, midsizes=[512,384,256], learning_rate=1e-3, batch_size=100, num_epoch=75):
+	def __init__(self, n_z=10, insize=784, midsizes=[512,384,256], learning_rate=1e-3, batch_size=100, num_epoch=100):
 		self.learning_rate = learning_rate
 		self.batch_size = batch_size
 		self.num_epoch = num_epoch		
@@ -101,7 +101,7 @@ class VariantionalAutoencoder(object): #(BaseEstimator, ClusterMixin):
 					feed_dict={self.x: batch}
 				)
 		
-			if epoch % 1 == 0:
+			if epoch % 10 == 0:
 				print('[Epoch {}] Loss: {}, Recon loss: {}, Latent loss: {}'.format(
 					epoch, loss, recon_loss, latent_loss))
 		print('Done!')
