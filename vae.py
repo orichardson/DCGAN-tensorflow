@@ -166,5 +166,5 @@ if __name__ == '__main__':
 			im = (x_generated[i*n+j, :].reshape(w, h)*255).astype(int)
 			I_generated[i*h:(i+1)*h, j*w:(j+1)*w] = im.reshape(w,h)
 			print(im.shape)
-			scipy.misc.imsave(im, './vae-out/im%d.jpg' % counter)
+			scipy.misc.imsave('./vae-out/im%d.jpg' % counter, im)
 			counter += 1
