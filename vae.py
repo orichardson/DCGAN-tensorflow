@@ -125,6 +125,7 @@ if __name__ == '__main__':
 	import os	
 	from glob import glob
 	from utils import get_image
+	from scipy.misc import imread
 
 	w = FLAGS.input_width
 	h = FLAGS.input_height
@@ -136,12 +137,7 @@ if __name__ == '__main__':
 	
 	filelist = glob(os.path.join("./data", FLAGS.dataset_name, FLAGS.input_fname_pattern))
 	print(next(iter(filelist)))
-	images = np.array([get_image(sample_file,
-				input_height=h,
-				input_width=w,
-				resize_height=h,
-				resize_width=w,
-				crop=FLAGS.crop) for sample_file in filelist]).reshape(-1, w*h)
+	images = np.array([imread(sample_file)[2:30,2:30] for sample_file in filelist]).reshape(-1, w*h)
 	print('images of shape:', images.shape)
 	print('range of image values: ', images.min(), images.max())
 	images /= 255
