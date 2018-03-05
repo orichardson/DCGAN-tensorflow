@@ -47,7 +47,7 @@ class VariantionalAutoencoder(object): #(BaseEstimator, ClusterMixin):
 		
 		prev = self.x
 		for li, size in enumerate(self.midsizes, 1):
-			fl = fc(prev, size, scope='enc_fc'+str(li), activation_fn=tf.nn.elu)
+			fl = fc(prev,  np.asscalar(size), scope='enc_fc'+str(li), activation_fn=tf.nn.elu)
 			prev = fl
 			
 		li += 1
@@ -66,7 +66,7 @@ class VariantionalAutoencoder(object): #(BaseEstimator, ClusterMixin):
 
 		prev = self.z
 		for li, size in enumerate(reversed(self.midsizes),1):
-			prev = fc(prev, size, scope='dec_fc'+str(li), activation_fn=tf.nn.elu)
+			prev = fc(prev,  np.asscalar(size), scope='dec_fc'+str(li), activation_fn=tf.nn.elu)
 
 		li += 1
 		
