@@ -128,7 +128,7 @@ class VariantionalAutoencoder(object): #(BaseEstimator, ClusterMixin):
 
 flags = tf.app.flags
 flags.DEFINE_string("sample_dir", "samples", "Directory name to save the image samples [samples]")
-flags.DEFINE_string("dataset_name", "mnist", "The name of dataset [celebA, mnist, lsun]")
+flags.DEFINE_string("dataset", "mnist", "The name of dataset [celebA, mnist, lsun]")
 flags.DEFINE_string('input_fname_pattern', '*.jpg', 'descriptor for files')
 flags.DEFINE_integer("input_height", None, "The size of image to use (will be center cropped). If none, resize model instead.")
 flags.DEFINE_integer("input_width", None, "The size of image to use (will be center cropped). If None, same value as input_height [None]")
