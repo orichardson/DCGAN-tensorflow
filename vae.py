@@ -7,6 +7,7 @@ https://github.com/shaohua0116/VAE-Tensorflow/blob/master/demo.py
 
 from tensorflow.contrib.slim import fully_connected as fc
 import tensorflow as tf
+import sys
 
 #from sklearn.base import BaseEstimator, ClusterMixin
 
@@ -119,6 +120,13 @@ class VariantionalAutoencoder(object): #(BaseEstimator, ClusterMixin):
 					[self.train_op, self.total_loss, self.recon_loss, self.latent_loss],
 					feed_dict={self.x: batch}
 				)
+				
+				if np.isnan(loss):
+					print('batch range: ', batch.min(), batch.max())
+					print('batch size: ', batch.shape)
+					G = globals()
+					G['evil_batch'] = batch
+					sys.exit(1)
 		
 			if epoch % 10 == 0:
 				print('[Epoch {}] Loss: {}, Recon loss: {}, Latent loss: {}'.format(
@@ -173,8 +181,8 @@ if __name__ == '__main__':
 	
 			
 	print('images of shape:', images.shape)
-	print('range of image values: ', images.min(), images.max())
 	images /= 255
+	print('range of image values: ', images.min(), images.max())
 	model.fit(images)
 	
 	
@@ -200,6 +208,6 @@ if __name__ == '__main__':
 				#'./samples/vae/%s-%s/split/im%d.jpg' % (flags.dataset, label, counter)
 				counter += 1
 				
-		scipy.misc.imsave(FLAGS.sample_dir+'/amalg%d.png'%kk, I_generated)
+		scipy.misc.imsave(FLAGS.sample_dir+'/amalg%d.pngx'%kk, I_generated)
 
 	print("********** done *********")
