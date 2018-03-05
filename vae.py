@@ -182,7 +182,7 @@ if __name__ == '__main__':
 	
 			
 	print('images of shape:', images.shape)
-	images /= 255
+	images = (images/255).astype(float)
 	print('range of image values: ', images.min(), images.max())
 	model.fit(images)
 	
