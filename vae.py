@@ -111,7 +111,7 @@ flags = tf.app.flags
 flags.DEFINE_string("sample_dir", "samples", "Directory name to save the image samples [samples]")
 flags.DEFINE_string("dataset_name", "mnist", "The name of dataset [celebA, mnist, lsun]")
 flags.DEFINE_string('input_fname_pattern', '*.jpg', 'descriptor for files')
-flags.DEFINE_integer("input_height", 28, "The size of image to use (will be center cropped). [108]")
+flags.DEFINE_integer("input_height", 28, "The size of image to use (will be center cropped). [28]")
 flags.DEFINE_integer("input_width", None, "The size of image to use (will be center cropped). If None, same value as input_height [None]")
 
 flags.DEFINE_boolean("crop", False, "True for training, False for testing [False]")
@@ -129,15 +129,22 @@ if __name__ == '__main__':
 
 	w = FLAGS.input_width
 	h = FLAGS.input_height
+	
+	## HACKY
+	border_r = (h-28)/2
+	border_c = (w-28)/2
+	
 	if h is None:
 		h = w
 
-	model = VariantionalAutoencoder(n_z = 5, insize=w*h)
+	model = VariantionalAutoencoder(n_z = 10, insize=w*h)
 
 	
 	filelist = glob(os.path.join("./data", FLAGS.dataset_name, FLAGS.input_fname_pattern))
 	print(next(iter(filelist)))
-	images = np.array([imread(sample_file)[2:30,2:30] for sample_file in filelist]).reshape(-1, w*h)
+	images = np.array([imread(sample_file)[border_r:border_r+h,border_r:border_r+w] \
+		for sample_file in filelist]).reshape(-1, w*h)
+			
 	print('images of shape:', images.shape)
 	print('range of image values: ', images.min(), images.max())
 	images /= 255
