@@ -52,7 +52,7 @@ class VariantionalAutoencoder(object): #(BaseEstimator, ClusterMixin):
 		li += 1
 		
 		self.z_mu = fc(prev, n_z, scope='enc_fc%d_mu' % li , activation_fn=None)
-		self.z_log_sigma_sq = fc(f3, n_z, scope='enc_fc%d_sigma' % li, activation_fn=None)
+		self.z_log_sigma_sq = fc(prev, n_z, scope='enc_fc%d_sigma' % li, activation_fn=None)
 		eps = tf.random_normal(shape=tf.shape(self.z_log_sigma_sq),
 							   mean=0, stddev=1, dtype=tf.float32)
 		self.z = self.z_mu + tf.sqrt(tf.exp(self.z_log_sigma_sq)) * eps
@@ -69,7 +69,7 @@ class VariantionalAutoencoder(object): #(BaseEstimator, ClusterMixin):
 
 		li += 1
 		
-		self.x_hat = fc(g3, n_x, scope='dec_fc%d' % li, activation_fn=tf.sigmoid)
+		self.x_hat = fc(prev, n_x, scope='dec_fc%d' % li, activation_fn=tf.sigmoid)
 
 		# Loss
 		# Reconstruction loss
