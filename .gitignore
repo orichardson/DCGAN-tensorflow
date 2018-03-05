@@ -8,7 +8,7 @@ test*
 record*.txt
 web/js/gen_layers.js
 *.npy
-
+vae-out/
 # checkpoint
 checkpoint
 
