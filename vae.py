@@ -187,9 +187,10 @@ if __name__ == '__main__':
 	
 	
 	ensure_directory(FLAGS.sample_dir)
-	
+	ensure_directory(FLAGS.sample_dir+'/split')
+
 	n = np.sqrt(model.batch_size).astype(np.int32)
-	
+		
 	counter = 0
 	
 	
