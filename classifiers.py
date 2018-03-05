@@ -105,7 +105,7 @@ def net():
 	from keras.models import Sequential
 	from keras.layers import Dense, Dropout, Flatten
 	from keras.layers import Conv2D, MaxPooling2D
-	from keras import backend as K
+	#from keras import backend as K
 
 	
 	def pre(X, Y):	
@@ -114,10 +114,16 @@ def net():
 		#img_rows, img_cols = 28, 28
 		#chan = 
 		#input_shape = (chan, img_rows, img_cols) if K.image_data_format() == 'channels_first' else (img_rows, img_cols, chan)
+
+		# First dimension is the sample. If the next two are provided and nothing else, then we still need a channel.
+		if len(X.shape) == 3:
+			X = X.reshape(*X.shape[1:], 1)
+
 		input_shape = X.shape[1:]
 		# X = X.reshape(X.shape[0], *input_shape)
 		X = X.astype('float32')
 		X /= 255
+		
 		
 		Y = keras.utils.to_categorical(Y, num_classes)
 		return X, Y, dict(num_classes=num_classes, input_shape=input_shape)
