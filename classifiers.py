@@ -117,7 +117,7 @@ def net():
 
 		# First dimension is the sample. If the next two are provided and nothing else, then we still need a channel.
 		if len(X.shape) == 3:
-			X = X.reshape(*X.shape[1:], 1)
+			X = X.reshape(*X.shape, 1)
 
 		input_shape = X.shape[1:]
 		# X = X.reshape(X.shape[0], *input_shape)
