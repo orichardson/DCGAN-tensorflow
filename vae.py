@@ -163,9 +163,8 @@ if __name__ == '__main__':
 	counter = 0
 	for i in range(n):
 		for j in range(n):
-			im = x_generated[i*n+j, :].reshape(28, 28)
+			im = x_generated[i*n+j, :].reshape(28, 28,1) *255
 			I_generated[i*h:(i+1)*h, j*w:(j+1)*w] = im
 			print(im.shape)
-			print(im)
 			scipy.misc.imsave(im, './vae-out/im%d.jpg' % counter)
 			counter += 1
