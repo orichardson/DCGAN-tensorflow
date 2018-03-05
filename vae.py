@@ -172,8 +172,8 @@ if __name__ == '__main__':
 
 	
 	## HACKY cropping instead of reading the appropriate thing
-	border_r = (im0.shape[0]-h)/2
-	border_c = (im0.shape[1]-w)/2
+	border_r = (im0.shape[0]-h)//2
+	border_c = (im0.shape[1]-w)//2
 	
 	model = VariantionalAutoencoder(n_z = 10, insize=w*h)
 	images = np.array([imread(sample_file)[border_r:border_r+h,border_r:border_r+w] \
