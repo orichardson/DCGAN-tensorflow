@@ -130,7 +130,7 @@ flags = tf.app.flags
 flags.DEFINE_string("sample_dir", "samples", "Directory name to save the image samples [samples]")
 flags.DEFINE_string("dataset_name", "mnist", "The name of dataset [celebA, mnist, lsun]")
 flags.DEFINE_string('input_fname_pattern', '*.jpg', 'descriptor for files')
-flags.DEFINE_integer("input_height", 28, "The size of image to use (will be center cropped). [28]")
+flags.DEFINE_integer("input_height", None, "The size of image to use (will be center cropped). If none, resize model instead.")
 flags.DEFINE_integer("input_width", None, "The size of image to use (will be center cropped). If None, same value as input_height [None]")
 flags.DEFINE_integer('batches_generated', 500, "Number of batches to generate")
 
@@ -149,21 +149,28 @@ if __name__ == '__main__':
 
 	w = FLAGS.input_width
 	h = FLAGS.input_height
-	
-	## HACKY
-	border_r = (h-28)/2
-	border_c = (w-28)/2
-	
+
 	if h is None:
 		h = w
 
-	model = VariantionalAutoencoder(n_z = 10, insize=w*h)
-
-	
 	filelist = glob(os.path.join("./data", FLAGS.dataset, FLAGS.input_fname_pattern))
 	print(next(iter(filelist)))
+	
+	im0 = imread(next(iter(filelist)))
+	
+	if w is None:
+		h, w = im0.shape[:2]
+
+	
+	## HACKY cropping instead of reading the appropriate thing
+	border_r = (im0.shape[0]-h)/2
+	border_c = (im0.shape[1]-w)/2
+	
+	model = VariantionalAutoencoder(n_z = 10, insize=w*h)
 	images = np.array([imread(sample_file)[border_r:border_r+h,border_r:border_r+w] \
 		for sample_file in filelist]).reshape(-1, w*h)
+
+	
 			
 	print('images of shape:', images.shape)
 	print('range of image values: ', images.min(), images.max())
