@@ -71,7 +71,7 @@ def build(pre, modeler, post, name):
 			expect = post(y_test)
 			
 			print(name, ' -- test data predicted')
-			sys.stdout.flush()
+			sys.stdout.flush()	
 			
 			report(expect, predict, "   Model: "+name+"\nTraining: "+train_descr+
 				"\n Testing: "+test_descr + adv, './results/'+FLAGS.log+'.txt')
@@ -277,30 +277,31 @@ if __name__ == '__main__':
 	Ys = []
 	
 	#datapath = './samples' 
-	datapath = './samples/'+gen_method
-	folders = [f for f in os.listdir(datapath) if f.startswith(datasetname+'-')]
-	
-	for f in folders:
-		label = int(f[len(datasetname)+1:])
+	for method in gen_method.split('&'): 
+		datapath = './samples/'+method 
+		folders = [f for f in os.listdir(datapath) if f.startswith(datasetname+'-')]
 		
-		extra = ''
-		if FLAGS.epoch > 0:
-			extra += '/epoch-%d' % FLAGS.epoch
+		for f in folders:
+			label = int(f[len(datasetname)+1:])
 			
-		if 'split' in  os.listdir(datapath+'/'+f + extra) :
-			extra += '/split'			
-
-		for idx, imagename in enumerate(os.listdir(datapath+'/'+f+extra)):
-			# silly test optimization, force smaller data.			
-			if idx > N_EXAMPLES / nlabels:
-				break;
-
-			# VERY IMPORTANT. This next line makes sure shitty training things from 
-			# early on in the GAN process are not reused.
-#			if ('test' in imagename):
-			dataX = scipy.misc.imread(datapath+'/'+f+extra+'/'+imagename)
-			Xs.append(dataX)
-			Ys.append(label)
+			extra = ''
+			if FLAGS.epoch > 0:
+				extra += '/epoch-%d' % FLAGS.epoch
+				
+			if 'split' in  os.listdir(datapath+'/'+f + extra) :
+				extra += '/split'			
+	
+			for idx, imagename in enumerate(os.listdir(datapath+'/'+f+extra)):
+				# silly test optimization, force smaller data.			
+				if idx > N_EXAMPLES / nlabels:
+					break;
+	
+				# VERY IMPORTANT. This next line makes sure shitty training things from 
+				# early on in the GAN process are not reused.
+	#			if ('test' in imagename):
+				dataX = scipy.misc.imread(datapath+'/'+f+extra+'/'+imagename)
+				Xs.append(dataX)
+				Ys.append(label)
 			
 	X_gen = np.array(Xs)
 	Y_gen = np.array(Ys)
