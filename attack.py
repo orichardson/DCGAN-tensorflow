@@ -6,7 +6,7 @@ Created on Sat Mar  3 07:37:24 2018
 """
 
 from cleverhans.attacks import FastGradientMethod
-from cleverhans.utils_keras import KerasModelWrapper
+from cleverhans.utils_keras import KerasModelWrapper, initialize_uninitialized_global_variables
 from cleverhans.utils_tf import model_eval
 
 
@@ -40,6 +40,7 @@ def attacks(model, X_test, Y_test):
 		preds_adv = model(adv_x)
 	
 		eval_par = {'batch_size': 10}
+		initialize_uninitialized_global_variables(sess)
 		acc = model_eval(sess, x, y, preds_adv, X_test, Y_test, args=eval_par)
 
 	return acc
