@@ -25,8 +25,8 @@ def attacks(model, X_test, Y_test):
 		
 	with tf.Session(config=run_config) as sess:
 		# Define input TF placeholder
-		x = tf.placeholder(tf.float32, shape=(None, 28, 28, 1))
-		y = tf.placeholder(tf.float32, shape=(None, 10))
+		x = tf.placeholder(tf.float32, shape=(None, *X_test.shape[1:]))
+		y = tf.placeholder(tf.float32, shape=(None, *Y_test.shape[1:]))
 	
 	
 		wrap = KerasModelWrapper(model)

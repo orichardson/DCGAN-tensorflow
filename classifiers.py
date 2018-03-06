@@ -47,11 +47,14 @@ def report(expected, predicted, message='', outfile = './results/record.txt') :
 def build(pre, modeler, post, name):
 	def train(x_train_raw, y_train_raw, train_descr):	
 		print('raw X,Y shapes: ', x_train_raw.shape, y_train_raw.shape)
+		sys.stdout.flush()
 		x_train,y_train, params = pre(x_train_raw, y_train_raw)
 		print(name, ' -- train data ready. ', x_train.shape, y_train.shape)
+		sys.stdout.flush()
 		
 		clf = modeler(x_train, y_train, **params)
 		print(name, ' -- train data fit.')
+		sys.stdout.flush()
 		
 		def test(x_test_raw, y_test_raw, test_descr):
 			x_test, y_test, params2 = pre(x_test_raw, y_test_raw)
@@ -68,6 +71,7 @@ def build(pre, modeler, post, name):
 			expect = post(y_test)
 			
 			print(name, ' -- test data predicted')
+			sys.stdout.flush()
 			
 			report(expect, predict, "   Model: "+name+"\nTraining: "+train_descr+
 				"\n Testing: "+test_descr + adv, './results/'+FLAGS.log+'.txt')
@@ -235,17 +239,23 @@ if __name__ == '__main__':
 		Xs = {'train': [], 'test':[]}
 		Ys = {'train': [], 'test':[]}
 		
+		
 		base = './data/'+datasetname
 		for slabel in os.listdir(base):
 			for mode in 'train', 'test':
+				count = 0
 				base2 = base + '/' + slabel+ '/' + mode
 				for imgfn in os.listdir(base2):
 					x = imread(base2+"/"+imgfn)
 					Xs[mode].append(x)
 					Ys[mode].append(int(slabel))
+					count += 1
+					
+					if count >= N_EXAMPLES:
+						break		
 		
-		
-		
+		print("original data loaded")
+		sys.stdout.flush()
 		return (np.array(Xs['train']), np.array(Ys['train'])), (np.array(Xs['test']), np.array(Ys['test']))
 
 		#raise ValueError('what is '+datasetname+'??')
