@@ -197,6 +197,9 @@ global VARS;
 if __name__ == '__main__':
 	import scipy.misc
 	
+	from keras import backend as K
+	K.set_learning_phase(1) #set learning phase
+	
 	N_EXAMPLES = FLAGS.examples
 	
 	# Questions
