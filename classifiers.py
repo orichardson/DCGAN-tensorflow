@@ -46,6 +46,7 @@ def report(expected, predicted, message='', outfile = './results/record.txt') :
 	
 def build(pre, modeler, post, name):
 	def train(x_train_raw, y_train_raw, train_descr):	
+		print('raw X,Y shapes: ', x_train_raw.shape, y_train_raw.shape)
 		x_train,y_train, params = pre(x_train_raw, y_train_raw)
 		print(name, ' -- train data ready. ', x_train.shape, y_train.shape)
 		
