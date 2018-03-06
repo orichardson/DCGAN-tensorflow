@@ -1,7 +1,7 @@
 DATASET=$1
 NLABELS=$2
 EPOCHS=${3:-40}
-SIZE=${3:-28}
+SIZE=${4:-28}
 
 # cat  | python -i create-dataset-models.py
 for ((e=3;e<EPOCHS;e+=3)); do
